@@ -1,0 +1,352 @@
+[
+  {
+    "id": 0,
+    "filename": "tile-00.png",
+    "path": "/images/bingo/tile-00.png",
+    "description": "Modern geometric snowflake wall art",
+    "category": "decoration"
+  },
+  {
+    "id": 1,
+    "filename": "tile-01.png",
+    "path": "/images/bingo/tile-01.png",
+    "description": "Modern, snowy pine tree close-up",
+    "category": "nature"
+  },
+  {
+    "id": 2,
+    "filename": "tile-02.png",
+    "path": "/images/bingo/tile-02.png",
+    "description": "Red and gold patterned ornament ball",
+    "category": "decoration"
+  },
+  {
+    "id": 3,
+    "filename": "tile-03.png",
+    "path": "/images/bingo/tile-03.png",
+    "description": "Snowy mountains, clear blue sky, frozen lake",
+    "category": "nature"
+  },
+  {
+    "id": 4,
+    "filename": "tile-04.png",
+    "path": "/images/bingo/tile-04.png",
+    "description": "Intricate ice crystals on frosted window pane",
+    "category": "nature"
+  },
+  {
+    "id": 5,
+    "filename": "tile-05.png",
+    "path": "/images/bingo/tile-05.png",
+    "description": "Steaming hot cocoa mug, modern winter scene",
+    "category": "food"
+  },
+  {
+    "id": 6,
+    "filename": "tile-06.png",
+    "path": "/images/bingo/tile-06.png",
+    "description": "Cozy red scarf, modern winter setting",
+    "category": "clothing"
+  },
+  {
+    "id": 7,
+    "filename": "tile-07.png",
+    "path": "/images/bingo/tile-07.png",
+    "description": "Modern cabin in snowy pine forest",
+    "category": "scene"
+  },
+  {
+    "id": 8,
+    "filename": "tile-08.png",
+    "path": "/images/bingo/tile-08.png",
+    "description": "Minimalist snowman with black top hat",
+    "category": "decoration"
+  },
+  {
+    "id": 9,
+    "filename": "tile-09.png",
+    "path": "/images/bingo/tile-09.png",
+    "description": "Evergreen wreath with pinecones, modern style",
+    "category": "decoration"
+  },
+  {
+    "id": 10,
+    "filename": "tile-10.png",
+    "path": "/images/bingo/tile-10.png",
+    "description": "Elegant white ice skates on ice block",
+    "category": "activity"
+  },
+  {
+    "id": 11,
+    "filename": "tile-11.png",
+    "path": "/images/bingo/tile-11.png",
+    "description": "Modern gray mittens on snowy wood.",
+    "category": "clothing"
+  },
+  {
+    "id": 12,
+    "filename": "tile-12.png",
+    "path": "/images/bingo/tile-12.png",
+    "description": "Modern snowy village with cool lighting",
+    "category": "scene"
+  },
+  {
+    "id": 13,
+    "filename": "tile-13.png",
+    "path": "/images/bingo/tile-13.png",
+    "description": "Icicles on modern building roof",
+    "category": "scene"
+  },
+  {
+    "id": 14,
+    "filename": "tile-14.png",
+    "path": "/images/bingo/tile-14.png",
+    "description": "Minimalist cardinal on snowy branch vector",
+    "category": "nature"
+  },
+  {
+    "id": 15,
+    "filename": "tile-15.png",
+    "path": "/images/bingo/tile-15.png",
+    "description": "Modern stack of corporate holiday presents",
+    "category": "decoration"
+  },
+  {
+    "id": 16,
+    "filename": "tile-16.png",
+    "path": "/images/bingo/tile-16.png",
+    "description": "Modern snow globe, abstract winter scene",
+    "category": "decoration"
+  },
+  {
+    "id": 17,
+    "filename": "tile-17.png",
+    "path": "/images/bingo/tile-17.png",
+    "description": "Wooden sled on pristine snow field",
+    "category": "scene"
+  },
+  {
+    "id": 18,
+    "filename": "tile-18.png",
+    "path": "/images/bingo/tile-18.png",
+    "description": "Frozen lake and snowy mountains landscape",
+    "category": "scene"
+  },
+  {
+    "id": 19,
+    "filename": "tile-19.png",
+    "path": "/images/bingo/tile-19.png",
+    "description": "Modern winter boots by minimalist fireplace",
+    "category": "clothing"
+  },
+  {
+    "id": 20,
+    "filename": "tile-20.png",
+    "path": "/images/bingo/tile-20.png",
+    "description": "Warm copper string lights on blue.",
+    "category": "decoration"
+  },
+  {
+    "id": 21,
+    "filename": "tile-21.png",
+    "path": "/images/bingo/tile-21.png",
+    "description": "Frosted pinecone cluster on slate",
+    "category": "nature"
+  },
+  {
+    "id": 22,
+    "filename": "tile-22.png",
+    "path": "/images/bingo/tile-22.png",
+    "description": "Modern wooden fence with fresh snow",
+    "category": "nature"
+  },
+  {
+    "id": 23,
+    "filename": "tile-23.png",
+    "path": "/images/bingo/tile-23.png",
+    "description": "Snow-dusted red winter berries on branch",
+    "category": "nature"
+  },
+  {
+    "id": 24,
+    "filename": "tile-24.png",
+    "path": "/images/bingo/tile-24.png",
+    "description": "Modern fireplace with holiday stockings",
+    "category": "decoration"
+  },
+  {
+    "id": 25,
+    "filename": "tile-25.png",
+    "path": "/images/bingo/tile-25.png",
+    "description": "Modern hot chocolate with three marshmallows",
+    "category": "food"
+  },
+  {
+    "id": 26,
+    "filename": "tile-26.png",
+    "path": "/images/bingo/tile-26.png",
+    "description": "Minimalist dark green knitted winter hat",
+    "category": "clothing"
+  },
+  {
+    "id": 27,
+    "filename": "tile-27.png",
+    "path": "/images/bingo/tile-27.png",
+    "description": "Minimalist snow angel impression in fresh snow",
+    "category": "activity"
+  },
+  {
+    "id": 28,
+    "filename": "tile-28.png",
+    "path": "/images/bingo/tile-28.png",
+    "description": "Stylized deer in snowy forest",
+    "category": "nature"
+  },
+  {
+    "id": 29,
+    "filename": "tile-29.png",
+    "path": "/images/bingo/tile-29.png",
+    "description": "Frosted evergreen branches with pinecones",
+    "category": "nature"
+  },
+  {
+    "id": 30,
+    "filename": "tile-30.png",
+    "path": "/images/bingo/tile-30.png",
+    "description": "Macro photograph of a blue ice crystal",
+    "category": "nature"
+  },
+  {
+    "id": 31,
+    "filename": "tile-31.png",
+    "path": "/images/bingo/tile-31.png",
+    "description": "Modern cottage in snowy winter landscape",
+    "category": "scene"
+  },
+  {
+    "id": 32,
+    "filename": "tile-32.png",
+    "path": "/images/bingo/tile-32.png",
+    "description": "Modern bridge in snowy landscape",
+    "category": "scene"
+  },
+  {
+    "id": 33,
+    "filename": "tile-33.png",
+    "path": "/images/bingo/tile-33.png",
+    "description": "Cardinal and chickadees at modern feeder",
+    "category": "nature"
+  },
+  {
+    "id": 34,
+    "filename": "tile-34.png",
+    "path": "/images/bingo/tile-34.png",
+    "description": "Majestic frozen waterfall in winter",
+    "category": "nature"
+  },
+  {
+    "id": 35,
+    "filename": "tile-35.png",
+    "path": "/images/bingo/tile-35.png",
+    "description": "Minimalist winter sunset over snowfield",
+    "category": "nature"
+  },
+  {
+    "id": 36,
+    "filename": "tile-36.png",
+    "path": "/images/bingo/tile-36.png",
+    "description": "Knit blanket and book on chair",
+    "category": "scene"
+  },
+  {
+    "id": 37,
+    "filename": "tile-37.png",
+    "path": "/images/bingo/tile-37.png",
+    "description": "Modern lantern glowing in fresh snow",
+    "category": "decoration"
+  },
+  {
+    "id": 38,
+    "filename": "tile-38.png",
+    "path": "/images/bingo/tile-38.png",
+    "description": "Modern mailbox in snowy landscape",
+    "category": "scene"
+  },
+  {
+    "id": 39,
+    "filename": "tile-39.png",
+    "path": "/images/bingo/tile-39.png",
+    "description": "Winding stone path through snowy forest",
+    "category": "nature"
+  },
+  {
+    "id": 40,
+    "filename": "tile-40.png",
+    "path": "/images/bingo/tile-40.png",
+    "description": "Minimalist frozen pond with dry reeds",
+    "category": "nature"
+  },
+  {
+    "id": 41,
+    "filename": "tile-41.png",
+    "path": "/images/bingo/tile-41.png",
+    "description": "Modern winter barn in countryside",
+    "category": "scene"
+  },
+  {
+    "id": 42,
+    "filename": "tile-42.png",
+    "path": "/images/bingo/tile-42.png",
+    "description": "Modern snow-covered bench at corporate park",
+    "category": "scene"
+  },
+  {
+    "id": 43,
+    "filename": "tile-43.png",
+    "path": "/images/bingo/tile-43.png",
+    "description": "Minimalist winter moon over dark trees",
+    "category": "nature"
+  },
+  {
+    "id": 44,
+    "filename": "tile-44.png",
+    "path": "/images/bingo/tile-44.png",
+    "description": "Steaming tea cup, winter window scene",
+    "category": "food"
+  },
+  {
+    "id": 45,
+    "filename": "tile-45.png",
+    "path": "/images/bingo/tile-45.png",
+    "description": "Modern silver wreath on dark door",
+    "category": "decoration"
+  },
+  {
+    "id": 46,
+    "filename": "tile-46.png",
+    "path": "/images/bingo/tile-46.png",
+    "description": "Modern snow-covered evergreen forest illustration",
+    "category": "nature"
+  },
+  {
+    "id": 47,
+    "filename": "tile-47.png",
+    "path": "/images/bingo/tile-47.png",
+    "description": "Modern white candles, winter greenery, wood tray",
+    "category": "decoration"
+  },
+  {
+    "id": 48,
+    "filename": "tile-48.png",
+    "path": "/images/bingo/tile-48.png",
+    "description": "Intricate frost patterns on glass pane",
+    "category": "nature"
+  },
+  {
+    "id": 49,
+    "filename": "tile-49.png",
+    "path": "/images/bingo/tile-49.png",
+    "description": "Modern silver sleigh bell, winter scene.",
+    "category": "decoration"
+  }
+]
