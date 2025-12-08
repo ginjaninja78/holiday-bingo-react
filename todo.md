@@ -281,3 +281,12 @@ This web version serves as a visual reference for the Windows native Wails appli
 - [ ] Implement multi-page generation
 - [ ] Add Card ID to each card
 - [ ] Implement batch generation endpoint
+
+
+## UI ENHANCEMENT (Dec 8, 2025)
+
+### Image Number Overlays ✅
+- [x] Add image number overlay to played images carousel (bottom-right corner)
+- [x] Add image number overlay to main play area (bottom-right corner)
+- [x] Style overlays with semi-transparent background for visibility
+- [x] Ensure numbers reflect call order (1, 2, 3, etc.)

@@ -262,7 +262,7 @@ export default function PlayScreen() {
                 <button
                   key={`${img.id}-${idx}`}
                   onClick={() => handleReviewImage(img)}
-                  className={`flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
+                  className={`flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all hover:scale-105 relative ${
                     reviewImage?.id === img.id
                       ? "border-yellow-500 ring-2 ring-yellow-500"
                       : isPaused
@@ -277,6 +277,10 @@ export default function PlayScreen() {
                     alt={img.alt}
                     className="w-full h-full object-cover"
                   />
+                  {/* Image Number Overlay */}
+                  <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs font-bold px-2 py-0.5 rounded">
+                    #{idx + 1}
+                  </div>
                 </button>
               ))}
             </div>
@@ -300,11 +304,17 @@ export default function PlayScreen() {
                     </Button>
                   </div>
                 )}
-                <img
-                  src={displayImage.url}
-                  alt={displayImage.alt}
-                  className="w-full h-auto rounded-2xl shadow-2xl"
-                />
+                <div className="relative">
+                  <img
+                    src={displayImage.url}
+                    alt={displayImage.alt}
+                    className="w-full h-auto rounded-2xl shadow-2xl"
+                  />
+                  {/* Image Number Overlay */}
+                  <div className="absolute bottom-4 right-4 bg-black/80 text-white text-2xl font-bold px-4 py-2 rounded-lg shadow-lg">
+                    #{playedImages.findIndex(img => img.id === displayImage.id) + 1}
+                  </div>
+                </div>
                 <div className="mt-4 text-center">
                   <p className="text-sm text-muted-foreground">
                     {displayImage.alt}
