@@ -10,21 +10,35 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Play, Pause, SkipForward, Trophy, Settings as SettingsIcon } from "lucide-react";
+import { Play, Pause, SkipForward, Trophy, Settings as SettingsIcon, StopCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { IMAGE_GALLERY, type GalleryImage } from "@shared/imageGallery";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { GameSetupPanel, type GameConfig } from "@/components/GameSetupPanel";
+import { GalleryPanel } from "@/components/GalleryPanel";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function PlayScreen() {
   const [gameStarted, setGameStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [currentImage, setCurrentImage] = useState<GalleryImage | null>(null);
+  const [lastPlayedImage, setLastPlayedImage] = useState<GalleryImage | null>(null);
   const [playedImages, setPlayedImages] = useState<GalleryImage[]>([]);
   const [remainingImages, setRemainingImages] = useState<GalleryImage[]>([]);
   const [shelfIconSize, setShelfIconSize] = useState(120);
   const [reviewImage, setReviewImage] = useState<GalleryImage | null>(null);
   const [showBingoDialog, setShowBingoDialog] = useState(false);
+  const [showEndRoundDialog, setShowEndRoundDialog] = useState(false);
+  const [showRoundCompleteDialog, setShowRoundCompleteDialog] = useState(false);
   const [cardUuid, setCardUuid] = useState("");
   const [gameConfig, setGameConfig] = useState<GameConfig | null>(null);
   const [currentRound, setCurrentRound] = useState(1);
@@ -35,51 +49,67 @@ export default function PlayScreen() {
     setRemainingImages(shuffled);
     setPlayedImages([]);
     setCurrentImage(null);
+    setLastPlayedImage(null);
+    setReviewImage(null);
     setGameStarted(true);
     setGameConfig(config);
     setCurrentRound(1);
+    setIsPaused(false);
     toast.success(`Game started! Round 1 of ${config.totalRounds}`);
   };
 
   // Call next image
   const handleNextImage = () => {
     if (remainingImages.length === 0) {
-      toast.info("All images have been called! Start a new round.");
+      toast.info("All images have been called! End the round to continue.");
       return;
     }
 
     const [nextImage, ...rest] = remainingImages;
     
+    // Move current image to played
     if (currentImage) {
       setPlayedImages(prev => [...prev, currentImage]);
     }
     
+    // Set new current image and update last played
     setCurrentImage(nextImage);
+    setLastPlayedImage(nextImage);
     setRemainingImages(rest);
-    setReviewImage(null); // Clear any review image
+    setReviewImage(null); // Clear any review
   };
 
   // Pause/Resume game
   const handlePauseResume = () => {
-    setIsPaused(!isPaused);
     if (!isPaused) {
-      toast.info("Game paused");
+      // Pausing
+      setIsPaused(true);
+      toast.info("Game paused - Click played images to review");
     } else {
+      // Resuming - return to last played image
+      setIsPaused(false);
+      setReviewImage(null);
+      setCurrentImage(lastPlayedImage);
       toast.success("Game resumed");
-      // Return to last played image if reviewing
-      if (reviewImage) {
-        setReviewImage(null);
-      }
     }
   };
 
-  // Review a previous image
+  // Review a played image (only when paused)
   const handleReviewImage = (image: GalleryImage) => {
     if (!isPaused) {
       toast.warning("Pause the game to review previous images");
       return;
     }
     setReviewImage(image);
+    setCurrentImage(image);
+  };
+
+  // Return to last played image
+  const handleBackToCurrent = () => {
+    if (lastPlayedImage) {
+      setCurrentImage(lastPlayedImage);
+      setReviewImage(null);
+    }
   };
 
   // Verify BINGO claim
@@ -115,7 +145,58 @@ export default function PlayScreen() {
     }
   };
 
-  const displayImage = reviewImage || currentImage;
+  // End round confirmation
+  const handleEndRound = () => {
+    setShowEndRoundDialog(true);
+  };
+
+  const confirmEndRound = () => {
+    setShowEndRoundDialog(false);
+    setShowRoundCompleteDialog(true);
+  };
+
+  // Start new round
+  const handleNewRound = () => {
+    if (!gameConfig) return;
+
+    const nextRound = currentRound + 1;
+    if (nextRound > gameConfig.totalRounds) {
+      toast.error("All rounds completed! Start a new game.");
+      setShowRoundCompleteDialog(false);
+      return;
+    }
+
+    // Reset for new round
+    const shuffled = [...IMAGE_GALLERY].sort(() => Math.random() - 0.5);
+    setRemainingImages(shuffled);
+    setPlayedImages([]);
+    setCurrentImage(null);
+    setLastPlayedImage(null);
+    setReviewImage(null);
+    setCurrentRound(nextRound);
+    setIsPaused(false);
+    setShowRoundCompleteDialog(false);
+    
+    toast.success(`Round ${nextRound} of ${gameConfig.totalRounds} started!`);
+  };
+
+  // End game
+  const handleEndGame = () => {
+    setGameStarted(false);
+    setGameConfig(null);
+    setCurrentRound(1);
+    setPlayedImages([]);
+    setRemainingImages([]);
+    setCurrentImage(null);
+    setLastPlayedImage(null);
+    setReviewImage(null);
+    setIsPaused(false);
+    setShowRoundCompleteDialog(false);
+    toast.success("Game ended");
+  };
+
+  const displayImage = currentImage;
+  const isReviewing = reviewImage !== null;
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5">
@@ -131,6 +212,7 @@ export default function PlayScreen() {
         </div>
         
         <div className="flex items-center gap-2">
+          <GalleryPanel />
           <SettingsPanel />
           {!gameStarted && (
             <GameSetupPanel onStartGame={initializeGame} />
@@ -178,8 +260,10 @@ export default function PlayScreen() {
                   onClick={() => handleReviewImage(img)}
                   className={`flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
                     reviewImage?.id === img.id
-                      ? "border-primary ring-2 ring-primary"
-                      : "border-border hover:border-primary/50"
+                      ? "border-yellow-500 ring-2 ring-yellow-500"
+                      : isPaused
+                      ? "border-border hover:border-primary cursor-pointer"
+                      : "border-border opacity-70 cursor-not-allowed"
                   }`}
                   style={{ width: shelfIconSize, height: shelfIconSize }}
                   disabled={!isPaused}
@@ -198,9 +282,18 @@ export default function PlayScreen() {
           <div className="flex-1 flex flex-col items-center justify-center p-8 relative">
             {displayImage ? (
               <div className="relative max-w-5xl w-full">
-                {reviewImage && (
-                  <div className="absolute top-0 left-0 bg-yellow-500 text-black px-4 py-2 rounded-br-lg font-bold z-10">
-                    REVIEWING
+                {isReviewing && (
+                  <div className="absolute top-0 left-0 bg-yellow-500 text-black px-4 py-2 rounded-br-lg font-bold z-10 flex items-center gap-2">
+                    <span>REVIEWING</span>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={handleBackToCurrent}
+                      className="ml-2"
+                    >
+                      <ArrowLeft className="h-4 w-4 mr-1" />
+                      Back to Current
+                    </Button>
                   </div>
                 )}
                 <img
@@ -247,7 +340,7 @@ export default function PlayScreen() {
 
               <Button
                 onClick={handleNextImage}
-                disabled={isPaused || remainingImages.length === 0}
+                disabled={isPaused || remainingImages.length === 0 || isReviewing}
                 size="lg"
               >
                 <SkipForward className="mr-2 h-5 w-5" />
@@ -259,15 +352,27 @@ export default function PlayScreen() {
               </div>
             </div>
 
-            <Button
-              onClick={() => setShowBingoDialog(true)}
-              variant="default"
-              size="lg"
-              className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
-            >
-              <Trophy className="mr-2 h-5 w-5" />
-              BINGO!
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleEndRound}
+                variant="outline"
+                size="lg"
+                className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+              >
+                <StopCircle className="mr-2 h-5 w-5" />
+                End Round
+              </Button>
+
+              <Button
+                onClick={() => setShowBingoDialog(true)}
+                variant="default"
+                size="lg"
+                className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
+              >
+                <Trophy className="mr-2 h-5 w-5" />
+                BINGO!
+              </Button>
+            </div>
           </div>
         </div>
       )}
@@ -325,6 +430,44 @@ export default function PlayScreen() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* End Round Confirmation Dialog */}
+      <AlertDialog open={showEndRoundDialog} onOpenChange={setShowEndRoundDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>End Round {currentRound}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to end the current round? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmEndRound}>
+              End Round
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Round Complete Dialog */}
+      <AlertDialog open={showRoundCompleteDialog} onOpenChange={setShowRoundCompleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Round {currentRound} Complete!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Would you like to start a new round or end the game?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleEndGame}>
+              End Game
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleNewRound}>
+              New Round
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

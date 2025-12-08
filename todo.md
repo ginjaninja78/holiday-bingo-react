@@ -181,3 +181,43 @@ This web version serves as a visual reference for the Windows native Wails appli
 5. Test full game flow with backend integration
 6. Provide user with Claude Code orchestration prompt
 7. Begin Windows native Wails integration after web version is complete
+
+
+## NEW FEATURES COMPLETED (2025-12-08)
+
+### Gallery Management Drawer ✅
+- [x] Create GalleryPanel component (drawer-style)
+- [x] Display all images in grid layout
+- [x] Implement single-select mode (click to select)
+- [x] Implement multi-select mode (toggle button + checkboxes)
+- [x] Add delete functionality for selected images
+- [x] Create "Recently Deleted" section with tab navigation
+- [x] Implement 30-day timer display on deleted images
+- [x] Add "Restore" button for recently deleted images
+- [x] Add "Delete Now" button for permanent deletion
+- [x] Add multi-select in Recently Deleted section
+- [x] Show deletion timestamp and days remaining badge
+- [x] Add "Select All" functionality
+- [x] Add selected count display
+- [x] Add opacity styling for deleted images
+
+### Enhanced Review Mode ✅
+- [x] Make played images shelf clickable
+- [x] When clicked, display selected image in main area
+- [x] Add "Reviewing" indicator in header
+- [x] Store last played image reference (lastPlayedIndex)
+- [x] Add "Back to Current" button during review mode
+- [x] Resume button returns to last played image (not reviewed image)
+- [x] Disable "Next Image" and "End Round" during review mode
+- [x] Add visual feedback for clickable played images
+
+### End Round Flow ✅
+- [x] Add "End Round" button to play screen controls
+- [x] Create confirmation dialog for ending round
+- [x] After confirmation, show "Round Complete" dialog
+- [x] "End Game" option - return to welcome screen
+- [x] "New Round" option - reset game state, increment round
+- [x] Preserve game configuration for new round
+- [x] Clear played images for new round
+- [x] Update round counter display
+- [x] Add proper dialog styling and button hierarchy
