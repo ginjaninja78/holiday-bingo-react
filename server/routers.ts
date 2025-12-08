@@ -5,12 +5,14 @@ import { publicProcedure, router } from "./_core/trpc";
 import { gameRouter } from "./gameRouter";
 import { adminAuthRouter } from "./adminAuthRouter";
 import { galleryRouter } from "./galleryRouter";
+import { bingoRouter } from "./bingoRouter";
 
 export const appRouter = router({
   system: systemRouter,
   game: gameRouter,
   adminAuth: adminAuthRouter,
   gallery: galleryRouter,
+  bingo: bingoRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

@@ -13,6 +13,7 @@ import {
 import { Play, Pause, SkipForward, Trophy, Settings as SettingsIcon, StopCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { IMAGE_GALLERY, type GalleryImage } from "@shared/imageGallery";
+import { trpc } from "@/lib/trpc";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { GameSetupPanel, type GameConfig } from "@/components/GameSetupPanel";
 import { GalleryPanel } from "@/components/GalleryPanel";
@@ -117,35 +118,40 @@ export default function PlayScreen() {
   };
 
   // Verify BINGO claim
+  const verifyBingoMutation = trpc.bingo.verifyBingo.useMutation();
+
   const handleVerifyBingo = async () => {
     if (!cardUuid.trim()) {
       toast.error("Please enter a Card ID");
       return;
     }
 
-    // TODO: Implement actual pattern verification logic
-    // For now, this is a placeholder that shows the structure
+    // Need a game ID - for now use 1, should be from game state
+    const gameId = 1; // TODO: Get from actual game state
     
     toast.info("Verifying BINGO claim...");
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const result = await verifyBingoMutation.mutateAsync({
+        cardId: cardUuid.toUpperCase(),
+        gameId,
+      });
       
-      // TODO: Replace with actual verification
-      // const isValid = await verifyBingoPattern(cardUuid, playedImages, gameConfig);
+      if (!result.success) {
+        toast.error(result.error || "Failed to verify BINGO");
+        return;
+      }
       
-      const isValid = Math.random() > 0.3; // Placeholder: 70% success rate
-      
-      if (isValid) {
-        toast.success("🎉 BINGO! Valid win confirmed!");
+      if (result.isWin) {
+        toast.success(result.message || "🎉 BINGO! Valid win confirmed!");
         setShowBingoDialog(false);
         setCardUuid("");
       } else {
-        toast.error("Invalid BINGO claim. Pattern not complete.");
+        toast.error(result.message || "Invalid BINGO claim. Pattern not complete.");
       }
     } catch (error) {
       toast.error("Failed to verify BINGO");
+      console.error(error);
     }
   };
 

@@ -209,8 +209,8 @@ export type InsertUnsplashSettings = typeof unsplashSettings.$inferInsert;
 export const generatedCards = mysqlTable("generated_cards", {
   id: int("id").autoincrement().primaryKey(),
   cardId: varchar("card_id", { length: 5 }).notNull().unique(), // 5-char alphanumeric
-  configId: int("config_id").notNull().references(() => hostGameConfigs.id),
-  cardData: json("card_data").notNull().$type<string[][]>(), // 5x5 grid of image IDs
+  gameId: int("game_id").references(() => hostGameState.id), // Optional: link to specific game
+  imageIds: json("image_ids").notNull().$type<number[]>(), // Flat array of 25 image IDs (-1 for FREE space)
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
