@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Image as ImageIcon, Trash2, RotateCcw, X } from "lucide-react";
 import { toast } from "sonner";
 import { IMAGE_GALLERY, type GalleryImage } from "@shared/imageGallery";
+import { trpc } from "@/lib/trpc";
 
 interface DeletedImage extends GalleryImage {
   deletedAt: number; // Unix timestamp
@@ -20,10 +21,37 @@ interface DeletedImage extends GalleryImage {
 }
 
 export function GalleryPanel() {
-  const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
-  const [deletedImages, setDeletedImages] = useState<DeletedImage[]>([]);
-  const [selectedDeleted, setSelectedDeleted] = useState<Set<string>>(new Set());
+  const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
+  const [selectedDeleted, setSelectedDeleted] = useState<Set<number>>(new Set());
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
+  
+  // Fetch gallery images from backend
+  const { data: galleryData = [], refetch: refetchGallery } = trpc.gallery.getAll.useQuery();
+  const { data: deletedData = [], refetch: refetchDeleted } = trpc.gallery.getDeleted.useQuery();
+  
+  // Mutations
+  const deleteMutation = trpc.gallery.delete.useMutation({
+    onSuccess: () => {
+      refetchGallery();
+      refetchDeleted();
+      toast.success('Images moved to Recently Deleted');
+    },
+  });
+  
+  const restoreMutation = trpc.gallery.restore.useMutation({
+    onSuccess: () => {
+      refetchGallery();
+      refetchDeleted();
+      toast.success('Images restored');
+    },
+  });
+  
+  const permanentDeleteMutation = trpc.gallery.permanentDelete.useMutation({
+    onSuccess: () => {
+      refetchDeleted();
+      toast.success('Images permanently deleted');
+    },
+  });
 
   // Calculate days remaining for deleted images
   const updateDeletedImages = (images: DeletedImage[]): DeletedImage[] => {
@@ -35,7 +63,7 @@ export function GalleryPanel() {
     }).filter(img => img.daysRemaining > 0); // Auto-remove expired items
   };
 
-  const handleImageClick = (imageId: string) => {
+  const handleImageClick = (imageId: number) => {
     if (isMultiSelectMode) {
       const newSelected = new Set(selectedImages);
       if (newSelected.has(imageId)) {
@@ -60,21 +88,8 @@ export function GalleryPanel() {
       return;
     }
 
-    const now = Date.now();
-    const imagesToDelete = IMAGE_GALLERY.filter(img => selectedImages.has(img.id));
-    const newDeleted: DeletedImage[] = imagesToDelete.map(img => ({
-      ...img,
-      deletedAt: now,
-      daysRemaining: 30
-    }));
-
-    setDeletedImages(prev => updateDeletedImages([...prev, ...newDeleted]));
+    deleteMutation.mutate({ imageIds: Array.from(selectedImages) });
     setSelectedImages(new Set());
-    
-    toast.success(`Moved ${imagesToDelete.length} image(s) to Recently Deleted`);
-    
-    // TODO: Update IMAGE_GALLERY to remove deleted images
-    // This would require backend integration
   };
 
   const handleRestoreSelected = () => {
@@ -83,13 +98,8 @@ export function GalleryPanel() {
       return;
     }
 
-    const imagesToRestore = deletedImages.filter(img => selectedDeleted.has(img.id));
-    setDeletedImages(prev => updateDeletedImages(prev.filter(img => !selectedDeleted.has(img.id))));
+    restoreMutation.mutate({ imageIds: Array.from(selectedDeleted) });
     setSelectedDeleted(new Set());
-    
-    toast.success(`Restored ${imagesToRestore.length} image(s)`);
-    
-    // TODO: Add back to IMAGE_GALLERY
   };
 
   const handleDeleteNow = () => {
@@ -98,16 +108,11 @@ export function GalleryPanel() {
       return;
     }
 
-    const count = selectedDeleted.size;
-    setDeletedImages(prev => updateDeletedImages(prev.filter(img => !selectedDeleted.has(img.id))));
+    permanentDeleteMutation.mutate({ imageIds: Array.from(selectedDeleted) });
     setSelectedDeleted(new Set());
-    
-    toast.success(`Permanently deleted ${count} image(s)`);
-    
-    // TODO: Permanently delete from backend
   };
 
-  const handleDeletedImageClick = (imageId: string) => {
+  const handleDeletedImageClick = (imageId: number) => {
     const newSelected = new Set(selectedDeleted);
     if (newSelected.has(imageId)) {
       newSelected.delete(imageId);
@@ -121,15 +126,15 @@ export function GalleryPanel() {
     if (selectedImages.size === IMAGE_GALLERY.length) {
       setSelectedImages(new Set());
     } else {
-      setSelectedImages(new Set(IMAGE_GALLERY.map(img => img.id)));
+      setSelectedImages(new Set(galleryData.map((img: any) => img.id)));
     }
   };
 
   const handleSelectAllDeleted = () => {
-    if (selectedDeleted.size === deletedImages.length) {
+    if (selectedDeleted.size === deletedData.length) {
       setSelectedDeleted(new Set());
     } else {
-      setSelectedDeleted(new Set(deletedImages.map(img => img.id)));
+      setSelectedDeleted(new Set(deletedData.map((img: any) => img.id)));
     }
   };
 
@@ -152,10 +157,10 @@ export function GalleryPanel() {
         <Tabs defaultValue="gallery" className="mt-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="gallery">
-              Gallery ({IMAGE_GALLERY.length})
+              Gallery ({galleryData.length})
             </TabsTrigger>
             <TabsTrigger value="deleted">
-              Recently Deleted ({deletedImages.length})
+              Recently Deleted ({deletedData.length})
             </TabsTrigger>
           </TabsList>
 
@@ -204,7 +209,7 @@ export function GalleryPanel() {
 
             {/* Image Grid */}
             <div className="grid grid-cols-3 gap-4">
-              {IMAGE_GALLERY.map((image) => {
+              {galleryData.map((image: any) => {
                 const isSelected = selectedImages.has(image.id);
                 return (
                   <div
@@ -241,7 +246,7 @@ export function GalleryPanel() {
 
           {/* Recently Deleted Tab */}
           <TabsContent value="deleted" className="space-y-4">
-            {deletedImages.length === 0 ? (
+            {deletedData.length === 0 ? (
               <div className="text-center py-12">
                 <Trash2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">No recently deleted images</p>
@@ -258,7 +263,7 @@ export function GalleryPanel() {
                     size="sm"
                     onClick={handleSelectAllDeleted}
                   >
-                    {selectedDeleted.size === deletedImages.length ? "Deselect All" : "Select All"}
+                    {selectedDeleted.size === deletedData.length ? "Deselect All" : "Select All"}
                   </Button>
                   
                   {selectedDeleted.size > 0 && (
@@ -288,7 +293,7 @@ export function GalleryPanel() {
 
                 {/* Deleted Images Grid */}
                 <div className="grid grid-cols-3 gap-4">
-                  {deletedImages.map((image) => {
+                  {deletedData.map((image: any) => {
                     const isSelected = selectedDeleted.has(image.id);
                     return (
                       <div

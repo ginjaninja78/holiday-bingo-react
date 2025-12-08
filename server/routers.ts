@@ -4,11 +4,13 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { gameRouter } from "./gameRouter";
 import { adminAuthRouter } from "./adminAuthRouter";
+import { galleryRouter } from "./galleryRouter";
 
 export const appRouter = router({
   system: systemRouter,
   game: gameRouter,
   adminAuth: adminAuthRouter,
+  gallery: galleryRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

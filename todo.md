@@ -221,3 +221,63 @@ This web version serves as a visual reference for the Windows native Wails appli
 - [x] Clear played images for new round
 - [x] Update round counter display
 - [x] Add proper dialog styling and button hierarchy
+
+
+## NEW REQUIREMENTS (2025-12-08 - Full Implementation)
+
+### Complete Package Export
+- [ ] Create downloadable ZIP with all UI components
+- [ ] Include all 40 sample images
+- [ ] Include card generation templates
+- [ ] Include game logic modules
+- [ ] Add README for local testing
+
+### Backend Implementation - Database Schema
+- [ ] Create game_sessions table (id, rounds, wins_per_round, current_round, status, created_at)
+- [ ] Create game_patterns table (game_id, round, pattern_type)
+- [ ] Create played_images table (game_id, image_id, played_at, order_index)
+- [ ] Create gallery_images table (id, url, label, source, deleted_at)
+- [ ] Create game_config table (unsplash_key, search_tags)
+- [ ] Run database migrations
+
+### Backend Implementation - tRPC Procedures
+- [ ] Implement game.saveConfig procedure
+- [ ] Implement game.start procedure
+- [ ] Implement game.nextImage procedure (with state tracking)
+- [ ] Implement game.pause procedure
+- [ ] Implement game.resume procedure
+- [ ] Implement game.endRound procedure
+- [ ] Implement game.newRound procedure
+- [ ] Implement game.verifyBingo procedure
+- [ ] Implement settings.saveUnsplash procedure
+- [ ] Implement gallery.getAll procedure
+- [ ] Implement gallery.delete procedure (soft delete)
+- [ ] Implement gallery.restore procedure
+- [ ] Implement gallery.permanentDelete procedure
+- [ ] Implement gallery.refresh procedure (Unsplash API)
+
+### Bug Fixes
+- [ ] Fix played images shelf population (connect to backend state)
+- [ ] Fix image display after Next Image click
+- [ ] Ensure review mode works with real played images
+
+### Card Generation Logic
+- [ ] Implement 5x5 grid generator with FREE center
+- [ ] Implement random image selection (no duplicates per card)
+- [ ] Implement Card ID generator (5-char alphanumeric)
+- [ ] Create card-to-image mapping storage
+
+### Pattern Verification Logic
+- [ ] Implement line detection (horizontal/vertical)
+- [ ] Implement diagonal detection
+- [ ] Implement four corners detection
+- [ ] Implement X pattern detection
+- [ ] Implement blackout detection
+- [ ] Create verification algorithm (card ID + played images + pattern)
+
+### PDF Generation
+- [ ] Research PDF library options (pdfkit, jsPDF, or puppeteer)
+- [ ] Create PDF template design
+- [ ] Implement multi-page generation
+- [ ] Add Card ID to each card
+- [ ] Implement batch generation endpoint

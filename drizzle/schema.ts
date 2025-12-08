@@ -145,3 +145,74 @@ export interface WinningPattern {
   name: string;
   positions?: [number, number][]; // For custom patterns: array of [row, col] positions
 }
+
+/**
+ * Gallery images for host-only mode
+ */
+export const galleryImages = mysqlTable("gallery_images", {
+  id: int("id").autoincrement().primaryKey(),
+  url: text("url").notNull(),
+  label: varchar("label", { length: 200 }).notNull(),
+  source: mysqlEnum("source", ["ai_generated", "unsplash"]).default("ai_generated").notNull(),
+  deletedAt: timestamp("deleted_at"), // Soft delete timestamp
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type GalleryImage = typeof galleryImages.$inferSelect;
+export type InsertGalleryImage = typeof galleryImages.$inferInsert;
+
+/**
+ * Host game state (for current active game)
+ */
+export const hostGameState = mysqlTable("host_game_state", {
+  id: int("id").autoincrement().primaryKey(),
+  hostId: int("host_id").notNull().references(() => users.id),
+  configId: int("config_id").notNull().references(() => hostGameConfigs.id),
+  currentRound: int("current_round").default(1).notNull(),
+  totalRounds: int("total_rounds").notNull(),
+  winsPerRound: int("wins_per_round").notNull(),
+  status: mysqlEnum("status", ["active", "paused", "ended"]).default("active").notNull(),
+  playedImages: json("played_images").notNull().$type<PlayedImage[]>(),
+  currentImageIndex: int("current_image_index").default(-1).notNull(), // -1 means no image shown yet
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type HostGameState = typeof hostGameState.$inferSelect;
+export type InsertHostGameState = typeof hostGameState.$inferInsert;
+
+export interface PlayedImage {
+  imageId: string;
+  imageUrl: string;
+  imageLabel: string;
+  playedAt: number; // Unix timestamp
+  orderIndex: number;
+}
+
+/**
+ * Unsplash settings
+ */
+export const unsplashSettings = mysqlTable("unsplash_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  hostId: int("host_id").notNull().references(() => users.id).unique(),
+  apiKey: text("api_key").notNull(),
+  searchTags: text("search_tags").notNull(), // Space-separated tags
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UnsplashSettings = typeof unsplashSettings.$inferSelect;
+export type InsertUnsplashSettings = typeof unsplashSettings.$inferInsert;
+
+/**
+ * Generated bingo cards with Card IDs (for host-only mode)
+ */
+export const generatedCards = mysqlTable("generated_cards", {
+  id: int("id").autoincrement().primaryKey(),
+  cardId: varchar("card_id", { length: 5 }).notNull().unique(), // 5-char alphanumeric
+  configId: int("config_id").notNull().references(() => hostGameConfigs.id),
+  cardData: json("card_data").notNull().$type<string[][]>(), // 5x5 grid of image IDs
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type GeneratedCard = typeof generatedCards.$inferSelect;
+export type InsertGeneratedCard = typeof generatedCards.$inferInsert;

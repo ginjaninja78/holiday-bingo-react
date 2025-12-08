@@ -67,16 +67,20 @@ export default function PlayScreen() {
 
     const [nextImage, ...rest] = remainingImages;
     
-    // Move current image to played
-    if (currentImage) {
-      setPlayedImages(prev => [...prev, currentImage]);
-    }
+    // Add the next image to played immediately (it's being "called")
+    setPlayedImages(prev => {
+      const updated = [...prev, nextImage];
+      console.log('Played images updated:', updated.length);
+      return updated;
+    });
     
     // Set new current image and update last played
     setCurrentImage(nextImage);
     setLastPlayedImage(nextImage);
     setRemainingImages(rest);
     setReviewImage(null); // Clear any review
+    
+    console.log('Next image called:', nextImage.alt, 'Remaining:', rest.length);
   };
 
   // Pause/Resume game
