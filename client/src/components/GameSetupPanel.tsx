@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Gamepad2, Download } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 interface GameSetupPanelProps {
   isOpen?: boolean;
@@ -79,20 +80,48 @@ export function GameSetupPanel({ isOpen, onOpenChange, onStartGame }: GameSetupP
     }));
   };
 
+  const generatePDFMutation = trpc.pdf.generateMultipleCards.useMutation();
+
   const handleGeneratePDFs = async () => {
     if (numPlayers < 1 || numGames < 1) {
       toast.error("Please enter valid numbers for players and games");
       return;
     }
 
-    toast.info(`Generating ${numPlayers} PDF files with ${numGames} cards each...`);
+    const totalCards = numPlayers * numGames;
+    toast.info(`Generating ${totalCards} bingo cards...`);
     
     try {
-      // TODO: Implement PDF generation
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate generation
-      toast.success(`Generated ${numPlayers} PDF files successfully!`);
+      const result = await generatePDFMutation.mutateAsync({
+        count: totalCards,
+        gamesPerPlayer: numGames,
+      });
+
+      // Convert base64 to blob and trigger download
+      const byteCharacters = atob(result.pdfData);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = result.fileName || "bingo-cards.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success(
+        `Generated ${totalCards} cards in ${result.totalPages} pages. Download started!`
+      );
     } catch (error) {
-      toast.error("Failed to generate PDFs");
+      console.error("PDF generation error:", error);
+      toast.error("Failed to generate PDFs. Please try again.");
     }
   };
 

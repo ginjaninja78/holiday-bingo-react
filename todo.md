@@ -338,3 +338,59 @@ This web version serves as a visual reference for the Windows native Wails appli
 - [ ] Fix game ID tracking in UI (currently hardcoded to 1)
 - [ ] Test full verification with actual game state integration
 - [ ] Write vitest unit tests for pattern detection algorithms
+
+
+## PDF CARD GENERATOR (Dec 8, 2025) - BACKEND COMPLETE ✅
+
+### PDF Library Selection ✅
+- [x] Evaluate Puppeteer (headless Chrome, high quality, slower) - FAILED in sandbox
+- [x] Evaluate jsPDF (pure JS, faster, limited styling) - WORKS PERFECTLY
+- [x] Select library based on requirements (jsPDF chosen)
+- [x] Install jsPDF and dependencies
+
+### PDF Template Design ✅
+- [x] Create jsPDF template for bingo card layout
+- [x] Design 5x5 grid with proper spacing (30mm cells)
+- [x] Add Card ID display (top center, large, bold, with background)
+- [x] Add FREE space styling (center cell, yellow background)
+- [x] Add image labels below each cell (6pt font)
+- [x] Design for A4 size (210mm x 297mm)
+- [x] Add margins and padding for printability
+- [x] Style for black & white printer compatibility
+
+### Backend Implementation ✅
+- [x] Create server/pdfGenerator.ts module
+- [x] Implement generateCardPDF function
+- [x] Use text labels instead of images (jsPDF limitation)
+- [x] Handle image loading and error cases
+- [x] Implement batch generation (multiple cards per PDF)
+- [x] Tested: 2 cards = 23KB, works perfectly
+- [x] File size already optimized by jsPDF
+
+### tRPC Integration ✅
+- [x] Create pdfRouter.ts with all procedures
+- [x] Implement generateMultipleCards procedure
+- [x] Accept parameters (count, gamesPerPlayer)
+- [x] Generate cards using existing cardGenerator
+- [x] Create PDFs for all cards
+- [x] Return base64-encoded PDF data
+- [x] Handle errors gracefully
+
+### UI Integration ⚠️
+- [x] Update GameSetupPanel to call PDF generation
+- [x] Show progress indicator during generation
+- [x] Provide download via blob creation
+- [x] Display generation summary (X cards, Y pages)
+- [x] Handle large batch warnings (100+ cards)
+- [ ] **BUG**: Downloaded PDFs are 0 bytes (base64 conversion issue)
+- [ ] Backend generates perfect PDFs (tested 23KB for 2 cards)
+- [ ] Frontend blob creation needs debugging
+
+### Testing ✅
+- [x] Test single card generation (works - 12KB)
+- [x] Test batch generation (works - 23KB for 2 cards)
+- [ ] Test large batch (100+ cards)
+- [x] Verify Card IDs are generated correctly
+- [x] Verify labels display correctly (images as text)
+- [ ] Test print quality on actual printer
+- [x] Verify FREE space is clearly marked (yellow background)

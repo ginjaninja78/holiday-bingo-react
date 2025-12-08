@@ -6,6 +6,7 @@ import { gameRouter } from "./gameRouter";
 import { adminAuthRouter } from "./adminAuthRouter";
 import { galleryRouter } from "./galleryRouter";
 import { bingoRouter } from "./bingoRouter";
+import { pdfRouter } from "./pdfRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -13,6 +14,7 @@ export const appRouter = router({
   adminAuth: adminAuthRouter,
   gallery: galleryRouter,
   bingo: bingoRouter,
+  pdf: pdfRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
