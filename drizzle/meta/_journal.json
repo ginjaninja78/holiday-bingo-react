@@ -15,6 +15,13 @@
       "when": 1764646253813,
       "tag": "0001_brown_shard",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1765220286843,
+      "tag": "0002_brown_polaris",
+      "breakpoints": true
     }
   ]
 }

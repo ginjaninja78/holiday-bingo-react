@@ -119,8 +119,29 @@ export type InsertAdminSession = typeof adminSessions.$inferInsert;
 /**
  * Type definitions for JSON fields
  */
+/**
+ * Host game configurations (for host-only mode)
+ */
+export const hostGameConfigs = mysqlTable("host_game_configs", {
+  id: int("id").autoincrement().primaryKey(),
+  hostId: int("host_id").notNull().references(() => users.id),
+  gameName: varchar("game_name", { length: 200 }).notNull(),
+  totalRounds: int("total_rounds").default(1).notNull(),
+  winsPerRound: int("wins_per_round").default(1).notNull(),
+  roundPatterns: json("round_patterns").notNull().$type<WinningPattern[]>(), // Array of patterns, one per round
+  imagePool: json("image_pool").notNull().$type<string[]>(), // Array of image IDs to use
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type HostGameConfig = typeof hostGameConfigs.$inferSelect;
+export type InsertHostGameConfig = typeof hostGameConfigs.$inferInsert;
+
+/**
+ * Type definitions for JSON fields
+ */
 export interface WinningPattern {
-  type: "line" | "diagonal" | "blackout" | "custom";
+  type: "line" | "diagonal" | "blackout" | "custom" | "four_corners" | "x_pattern";
   name: string;
   positions?: [number, number][]; // For custom patterns: array of [row, col] positions
 }

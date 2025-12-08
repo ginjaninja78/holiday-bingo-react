@@ -1,22 +1,13 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { Snowflake } from "lucide-react";
 
 export default function Home() {
-  const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
 
   const handleHostGame = () => {
-    if (user) {
-      setLocation("/host");
-    } else {
-      window.location.href = getLoginUrl();
-    }
+    setLocation("/play");
   };
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -52,9 +43,8 @@ export default function Home() {
               onClick={handleHostGame}
               size="lg"
               className="w-full text-lg py-6"
-              disabled={loading}
             >
-              {user ? "Go to Host Dashboard" : "Sign In to Host"}
+              Go to Host Dashboard
             </Button>
           </div>
         </div>
