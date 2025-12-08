@@ -1,8 +1,5 @@
-import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { Snowflake } from "lucide-react";
@@ -10,7 +7,6 @@ import { Snowflake } from "lucide-react";
 export default function Home() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
-  const [sessionCode, setSessionCode] = useState("");
 
   const handleHostGame = () => {
     if (user) {
@@ -20,12 +16,7 @@ export default function Home() {
     }
   };
 
-  const handleJoinGame = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (sessionCode.trim()) {
-      setLocation(`/join/${sessionCode.trim().toUpperCase()}`);
-    }
-  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -45,9 +36,9 @@ export default function Home() {
         </div>
 
         {/* Main Actions */}
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
-          {/* Host Game Card */}
-          <div className="glass rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-shadow">
+        <div className="flex justify-center mb-12">
+          {/* Host Game Card - Centered */}
+          <div className="glass rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-shadow max-w-md w-full">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">🎮</span>
@@ -65,43 +56,6 @@ export default function Home() {
             >
               {user ? "Go to Host Dashboard" : "Sign In to Host"}
             </Button>
-          </div>
-
-          {/* Join Game Card */}
-          <div className="glass rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-shadow">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-3xl">🎯</span>
-              </div>
-              <h2 className="text-2xl font-bold mb-2">Join a Game</h2>
-              <p className="text-muted-foreground">
-                Enter a session code to play
-              </p>
-            </div>
-            <form onSubmit={handleJoinGame} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="sessionCode" className="text-base">
-                  Session Code
-                </Label>
-                <Input
-                  id="sessionCode"
-                  type="text"
-                  placeholder="Enter code"
-                  value={sessionCode}
-                  onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
-                  className="text-lg py-6 text-center font-mono"
-                  maxLength={16}
-                />
-              </div>
-              <Button
-                type="submit"
-                size="lg"
-                variant="secondary"
-                className="w-full text-lg py-6"
-              >
-                Join Game
-              </Button>
-            </form>
           </div>
         </div>
 
