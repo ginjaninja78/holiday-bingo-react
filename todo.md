@@ -394,3 +394,84 @@ This web version serves as a visual reference for the Windows native Wails appli
 - [x] Verify labels display correctly (images as text)
 - [ ] Test print quality on actual printer
 - [x] Verify FREE space is clearly marked (yellow background)
+
+
+## PRIORITY: FUNCTIONAL PDF CARD GENERATION (Dec 8, 2025)
+
+### Frontend Download Fix ✅
+- [x] Debug base64-to-blob conversion in GameSetupPanel
+- [x] Test blob creation with actual PDF data
+- [x] Verify download triggers correctly
+- [x] Confirm downloaded file is not 0 bytes (126KB)
+- [x] Test with different player counts (12 cards)
+
+### Image Embedding in PDF ⚠️
+- [x] Research jsPDF image embedding (addImage method)
+- [x] Fetch gallery images from database
+- [x] Implement image tiling in 5x5 grid cells
+- [x] Resize images to fit cell dimensions (30mm x 22mm)
+- [x] Ensure FREE space remains text-only
+- [ ] Images showing as labels only (jsPDF can't load URLs)
+- [ ] Need to convert URLs to base64 or use local files
+
+### Database Integration ✅
+- [x] Ensure Card IDs are saved to generated_cards table
+- [x] Link cards to game_id (create game session on generation)
+- [x] Store image_ids array for each card
+- [x] Add created_at timestamp
+- [x] Verify cards can be retrieved by Card ID
+- [x] Test card lookup for BINGO verification
+
+### End-to-End Testing ✅
+- [x] Generate 12-card PDF and verify download (126KB)
+- [x] Open PDF and verify layout (labels visible, images need fix)
+- [x] Verify Card IDs are unique and readable (MYJHF, SG7MW, etc.)
+- [x] Verify FREE space is clearly marked (yellow background)
+- [x] Test BINGO verification with generated Card ID
+- [x] Verify pattern detection works with card images
+
+## FUTURE PANELS (Lower Priority)
+
+### Player Roster Panel
+- [ ] Create PlayerRosterPanel component (drawer-style)
+- [ ] Display list of active players with Card IDs
+- [ ] Show player join timestamps
+- [ ] Add search/filter functionality
+- [ ] Match existing sidebar tool look/feel
+- [ ] Add player count summary
+
+### Score Tracking Panel
+- [ ] Create ScoreTrackingPanel component (drawer-style)
+- [ ] Display leaderboard by round
+- [ ] Show win history for each player
+- [ ] Track total wins across all rounds
+- [ ] Add round-by-round breakdown
+- [ ] Match existing sidebar tool look/feel
+- [ ] Export scores to CSV option
+
+
+## DAY 2 FEATURES (Configurable via Settings)
+
+### AI Voice Announcer
+- [ ] Add voice settings to SettingsPanel (provider, voice, sass level)
+- [ ] Integrate ElevenLabs/OpenAI TTS API
+- [ ] Create announcement templates with corporate-appropriate sass
+- [ ] Add voice toggle in PlayScreen
+- [ ] Announce image name when called
+- [ ] Announce BINGO verification results
+- [ ] Add volume control
+
+### Animations & Polish
+- [ ] Add pause animation (dim screen, show "PAUSED" overlay)
+- [ ] Add BINGO! celebration animation (confetti, sound effect)
+- [ ] Add smooth transitions for image changes
+- [ ] Add card flip animation for played images
+- [ ] Add winner announcement animation
+- [ ] Add round transition animations
+
+### Additional Settings
+- [ ] Auto-advance timer (optional)
+- [ ] Image display duration
+- [ ] Animation speed controls
+- [ ] Theme customization (colors)
+- [ ] Sound effects toggle

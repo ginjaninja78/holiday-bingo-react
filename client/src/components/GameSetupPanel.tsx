@@ -97,7 +97,21 @@ export function GameSetupPanel({ isOpen, onOpenChange, onStartGame }: GameSetupP
         gamesPerPlayer: numGames,
       });
 
+      console.log("[PDF Download] Result:", {
+        success: result.success,
+        fileName: result.fileName,
+        cardIds: result.cardIds,
+        totalPages: result.totalPages,
+        pdfDataLength: result.pdfData?.length || 0,
+        pdfDataPreview: result.pdfData?.substring(0, 50),
+      });
+
+      if (!result.pdfData) {
+        throw new Error("No PDF data received from server");
+      }
+
       // Convert base64 to blob and trigger download
+      console.log("[PDF Download] Converting base64 to blob...");
       const byteCharacters = atob(result.pdfData);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
@@ -105,6 +119,10 @@ export function GameSetupPanel({ isOpen, onOpenChange, onStartGame }: GameSetupP
       }
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], { type: "application/pdf" });
+      console.log("[PDF Download] Blob created:", {
+        size: blob.size,
+        type: blob.type,
+      });
 
       // Create download link
       const url = window.URL.createObjectURL(blob);

@@ -87,19 +87,33 @@ async function generateCardPDF(
         doc.setTextColor(0, 0, 0);
       } else {
         const img = images[index];
-        if (img) {
-          // Image placeholder (we'll just show the label for now since embedding images is complex)
-          doc.setFillColor(248, 250, 252);
-          doc.rect(x, y, cellSize, cellSize - 8, "F");
-
-          // Label
-          doc.setFontSize(6);
-          doc.setFont("helvetica", "normal");
-          doc.setTextColor(71, 85, 105);
-          const labelLines = doc.splitTextToSize(img.label, cellSize - 4);
-          const labelY = y + cellSize - 6;
-          doc.text(labelLines.slice(0, 2), x + cellSize / 2, labelY, { align: "center" });
-          doc.setTextColor(0, 0, 0);
+        if (img && img.url) {
+          try {
+            // Add image
+            const imgWidth = cellSize - 2;
+            const imgHeight = cellSize - 10;
+            doc.addImage(img.url, "JPEG", x + 1, y + 1, imgWidth, imgHeight, undefined, "FAST");
+            
+            // Label below image
+            doc.setFontSize(6);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(71, 85, 105);
+            const labelLines = doc.splitTextToSize(img.label, cellSize - 4);
+            const labelY = y + cellSize - 6;
+            doc.text(labelLines.slice(0, 1), x + cellSize / 2, labelY, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+          } catch (e) {
+            // Fallback to label only if image fails
+            doc.setFillColor(248, 250, 252);
+            doc.rect(x, y, cellSize, cellSize - 8, "F");
+            doc.setFontSize(6);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(71, 85, 105);
+            const labelLines = doc.splitTextToSize(img.label, cellSize - 4);
+            const labelY = y + cellSize - 6;
+            doc.text(labelLines.slice(0, 2), x + cellSize / 2, labelY, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+          }
         }
       }
     }
