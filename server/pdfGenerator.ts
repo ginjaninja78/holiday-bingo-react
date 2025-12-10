@@ -8,6 +8,7 @@ import { getDb } from "./db";
 import { galleryImages, generatedCards } from "../drizzle/schema";
 import { eq, inArray, isNull } from "drizzle-orm";
 import { generateBingoCards } from "../shared/cardGenerator";
+import { resizeAndConvertToBase64 } from "./imageUtils";
 
 export interface PDFGenerationOptions {
   count: number; // Number of cards to generate
@@ -26,6 +27,7 @@ export interface PDFGenerationResult {
 interface CardImage {
   url: string;
   label: string;
+  base64?: string;
 }
 
 /**
@@ -87,12 +89,12 @@ async function generateCardPDF(
         doc.setTextColor(0, 0, 0);
       } else {
         const img = images[index];
-        if (img && img.url) {
+        if (img && img.base64) {
           try {
             // Add image
             const imgWidth = cellSize - 2;
             const imgHeight = cellSize - 10;
-            doc.addImage(img.url, "JPEG", x + 1, y + 1, imgWidth, imgHeight, undefined, "FAST");
+            doc.addImage(img.base64, "PNG", x + 1, y + 1, imgWidth, imgHeight, undefined, "FAST");
             
             // Label below image
             doc.setFontSize(6);
@@ -249,8 +251,28 @@ export async function generateMultipleCardsPDF(
       savedCardIds.push(card.cardId);
     }
 
-    // Build card template data
-    const imageMap = new Map(images.map((img) => [img.id, img]));
+    // Build card template data and convert only used images to base64
+    const usedImageIds = new Set<number>();
+    cards.forEach(card => card.imageIds.forEach(id => { if (id !== -1) usedImageIds.add(id); }));
+    console.log("[PDF] Converting", usedImageIds.size, "unique images to base64...");
+    
+    const imageMap = new Map<number, typeof images[0] & { base64?: string }>();
+    for (const img of images) {
+      if (!usedImageIds.has(img.id)) {
+        imageMap.set(img.id, img); // Skip unused images
+        continue;
+      }
+      try {
+        // Use local filesystem path with resizing
+        const localPath = `/home/ubuntu/holiday-bingo/client/public${img.url}`;
+        const base64 = await resizeAndConvertToBase64(localPath, 200);
+        imageMap.set(img.id, { ...img, base64 });
+      } catch (error) {
+        console.error(`[PDF] Failed to convert image ${img.id}:`, error);
+        imageMap.set(img.id, img); // Fallback without base64
+      }
+    }
+    console.log("[PDF] Image conversion complete");
 
     // Generate PDF
     const doc = new jsPDF({
@@ -268,7 +290,7 @@ export async function generateMultipleCardsPDF(
       const cardImages = card.imageIds.map((id) => {
         if (id === -1) return null; // FREE space
         const img = imageMap.get(id);
-        return img ? { url: img.url, label: img.label } : null;
+        return img ? { url: img.url, label: img.label, base64: img.base64 } : null;
       });
 
       await generateCardPDF(doc, card.cardId, cardImages);
