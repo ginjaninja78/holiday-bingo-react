@@ -10,13 +10,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Play, Pause, SkipForward, Trophy, Settings as SettingsIcon, StopCircle, ArrowLeft } from "lucide-react";
+import { Play, Pause, SkipForward, Trophy, Settings as SettingsIcon, StopCircle, ArrowLeft, Users } from "lucide-react";
 import { toast } from "sonner";
 import { IMAGE_GALLERY, type GalleryImage } from "@shared/imageGallery";
 import { trpc } from "@/lib/trpc";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { GameSetupPanel, type GameConfig } from "@/components/GameSetupPanel";
 import { GalleryPanel } from "@/components/GalleryPanel";
+import { PlayerRosterPanel } from "@/components/PlayerRosterPanel";
+import { ScoreTrackingPanel } from "@/components/ScoreTrackingPanel";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +45,8 @@ export default function PlayScreen() {
   const [cardUuid, setCardUuid] = useState("");
   const [gameConfig, setGameConfig] = useState<GameConfig | null>(null);
   const [currentRound, setCurrentRound] = useState(1);
+  const [showRosterPanel, setShowRosterPanel] = useState(false);
+  const [showScorePanel, setShowScorePanel] = useState(false);
 
   // Initialize game with shuffled images
   const initializeGame = (config: GameConfig) => {
@@ -222,6 +226,14 @@ export default function PlayScreen() {
         </div>
         
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setShowRosterPanel(true)}>
+            <Users className="h-4 w-4 mr-2" />
+            Players
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setShowScorePanel(true)}>
+            <Trophy className="h-4 w-4 mr-2" />
+            Scores
+          </Button>
           <GalleryPanel />
           <SettingsPanel />
           {!gameStarted && (
@@ -488,6 +500,18 @@ export default function PlayScreen() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Player Roster Panel */}
+      <PlayerRosterPanel 
+        isOpen={showRosterPanel} 
+        onClose={() => setShowRosterPanel(false)} 
+      />
+
+      {/* Score Tracking Panel */}
+      <ScoreTrackingPanel 
+        isOpen={showScorePanel} 
+        onClose={() => setShowScorePanel(false)} 
+      />
     </div>
   );
 }
