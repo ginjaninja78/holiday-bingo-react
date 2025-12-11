@@ -495,6 +495,8 @@ This web version serves as a visual reference for the Windows native Wails appli
 - [x] Update game_history table to include player_uuid references
 - [x] Add player_scores table (player_uuid, game_id, wins, patterns_won)
 - [x] Push database migrations
+- [x] Add batch_id to generated_cards table
+- [x] Add game_id (MMDDYY-HHMM format) to game_history table
 
 ### Player Management Panel (Gallery-Style Drawer)
 - [x] Create PlayerManagementPanel component
@@ -577,3 +579,56 @@ This web version serves as a visual reference for the Windows native Wails appli
 - [ ] Test score updates during live gameplay
 - [ ] Test leaderboard with real player names
 - [ ] Verify Player UUID tracking throughout system
+
+
+## CRITICAL BUGS & NEW FEATURES (Dec 11, 2025 - User Feedback)
+
+### Critical Bugs
+- [x] Fix gallery image loading (only 9/60 images showing, rest are placeholders)
+- [x] Update database to reflect all 60 recovered images
+- [x] Fix "40 images remaining" message (should be 60)
+- [x] Update Settings panel to show correct image count
+
+### Leaderboard Redesign
+- [ ] Change leaderboard colors from red/pink to different color scheme
+- [ ] Change "Card: ABC12" to "Player #: 1" (or player name if entered)
+- [ ] Link player roster to show player numbers instead of card IDs
+
+### End-of-Round Winner Display
+- [ ] Create winner podium component with gold/silver/bronze medals
+- [ ] Display top 3 players in circular avatars with medals
+- [ ] Create end-game summary screen with all winners carousel
+- [ ] Add game statistics summary
+
+### Batch ID System
+- [ ] Add batch_id UUID to generated_cards table
+- [ ] Assign batch_id to all cards generated in single PDF operation
+- [ ] Create batch selection dropdown in player roster
+- [ ] Add search bar for batch selection
+- [ ] Implement multi-select for batches
+- [ ] Auto-populate last generated batch in player roster
+- [ ] Add "Add Batch" and "Cancel" buttons to batch selector
+
+### Player Roster Overhaul
+- [ ] Change from Card ID to Player # system
+- [ ] Add Name field for each player (optional, displayed if entered)
+- [ ] Link multiple cards to single player via batch_id
+- [ ] Display player count instead of card count
+
+### CSV Import/Export Enhancement
+- [ ] Add batch/player selection screen for export
+- [ ] Add confirmation popup for CSV import
+- [ ] Show import summary (X players, Y cards, Z batches)
+- [ ] Update CSV format to include batch_id
+
+### Game ID System
+- [ ] Create game_id format: MMDDYY-HHMM (e.g., 121125-1430)
+- [ ] Assign game_id on game start
+- [ ] Display game_id on leaderboard header
+- [ ] Make game_id clickable to open previous games panel
+- [ ] Add game_id to game history records
+
+### Host Name Editing
+- [ ] Make "Welcome, Host!" clickable to edit host name
+- [ ] Add inline edit or dialog for host name change
+- [ ] Persist host name in game state/settings

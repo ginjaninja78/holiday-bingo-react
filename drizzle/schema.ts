@@ -238,6 +238,7 @@ export type InsertUnsplashSettings = typeof unsplashSettings.$inferInsert;
 export const generatedCards = mysqlTable("generated_cards", {
   id: int("id").autoincrement().primaryKey(),
   cardId: varchar("card_id", { length: 5 }).notNull().unique(), // 5-char alphanumeric
+  batchId: varchar("batch_id", { length: 64 }), // UUID for batch of cards generated together
   gameId: int("game_id").references(() => hostGameState.id), // Optional: link to specific game
   imageIds: json("image_ids").notNull().$type<number[]>(), // Flat array of 25 image IDs (-1 for FREE space)
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -251,6 +252,7 @@ export type InsertGeneratedCard = typeof generatedCards.$inferInsert;
  */
 export const gameHistory = mysqlTable("game_history", {
   id: int("id").autoincrement().primaryKey(),
+  gameId: varchar("game_id", { length: 13 }).notNull().unique(), // Format: MMDDYY-HHMM
   hostId: int("host_id").notNull().references(() => users.id),
   gameName: varchar("game_name", { length: 200 }),
   totalRounds: int("total_rounds").notNull(),

@@ -46,7 +46,17 @@ export const gameHistoryRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
+      // Generate game ID in format MMDDYY-HHMM
+      const startDate = new Date(input.startedAt);
+      const month = String(startDate.getMonth() + 1).padStart(2, '0');
+      const day = String(startDate.getDate()).padStart(2, '0');
+      const year = String(startDate.getFullYear()).slice(-2);
+      const hours = String(startDate.getHours()).padStart(2, '0');
+      const minutes = String(startDate.getMinutes()).padStart(2, '0');
+      const gameId = `${month}${day}${year}-${hours}${minutes}`;
+
       await db.insert(gameHistory).values({
+        gameId,
         hostId: input.hostId,
         gameName: input.gameName || null,
         totalRounds: input.totalRounds,
@@ -57,7 +67,7 @@ export const gameHistoryRouter = router({
         startedAt: new Date(input.startedAt),
       });
 
-      return { success: true };
+      return { success: true, gameId };
     }),
 
   /**
