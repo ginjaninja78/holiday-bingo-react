@@ -475,3 +475,13 @@ This web version serves as a visual reference for the Windows native Wails appli
 - [ ] Animation speed controls
 - [ ] Theme customization (colors)
 - [ ] Sound effects toggle
+
+
+## GALLERY EXPANSION (Dec 10, 2025)
+
+- [ ] Generate 10 new corporate-safe holiday images
+- [ ] Save images to client/public/images/gallery/
+- [ ] Add images to database via seed script
+- [ ] Update IMAGE_GALLERY constant
+- [ ] Test new images in gameplay
+- [ ] Test new images in PDF generation

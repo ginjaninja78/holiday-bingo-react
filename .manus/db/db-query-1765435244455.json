@@ -1,0 +1,18 @@
+{
+  "query": "SELECT * FROM gallery_images LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2podaE9eWugRKvf.aeda70bcbee1 --database EACR5LxScQkKAsrZZvc3Jy --execute SELECT * FROM gallery_images LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "url": "/gallery/001_christmas_tree_snow.png",
+      "label": "Christmas tree in snow",
+      "source": "ai_generated",
+      "deleted_at": "NULL",
+      "created_at": "2025-12-08 19:55:19"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\turl\tlabel\tsource\tdeleted_at\tcreated_at\n1\t/gallery/001_christmas_tree_snow.png\tChristmas tree in snow\tai_generated\tNULL\t2025-12-08 19:55:19\n",
+  "stderr": "",
+  "execution_time_ms": 67
+}
