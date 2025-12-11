@@ -10,6 +10,9 @@ import {
   generateMultipleCardsPDF,
   generatePDFsForCards,
 } from "./pdfGenerator";
+import { getDb } from "./db";
+import { managedPlayers, playerCards } from "../drizzle/schema";
+import { v4 as uuidv4 } from "uuid";
 
 export const pdfRouter = router({
   /**
@@ -48,6 +51,8 @@ export const pdfRouter = router({
       z.object({
         count: z.number().min(1).max(1000),
         gamesPerPlayer: z.number().min(1).max(10).default(1),
+        playerName: z.string().optional(),
+        createPlayer: z.boolean().default(true),
       })
     )
     .mutation(async ({ input }) => {
@@ -60,6 +65,30 @@ export const pdfRouter = router({
         throw new Error(result.error || "Failed to generate PDF");
       }
 
+      // Auto-create player and link cards if requested
+      let playerUuid: string | null = null;
+      if (input.createPlayer && result.cardIds) {
+        const db = await getDb();
+        if (db) {
+          playerUuid = uuidv4();
+          
+          // Create managed player
+          await db.insert(managedPlayers).values({
+            playerUuid,
+            playerName: input.playerName || null,
+          });
+
+          // Link all cards to this player
+          for (const cardId of result.cardIds) {
+            await db.insert(playerCards).values({
+              playerUuid,
+              cardId,
+              isPlayed: false,
+            });
+          }
+        }
+      }
+
       // Convert buffer to base64 for transmission
       const base64 = result.pdfBuffer!.toString("base64");
 
@@ -69,7 +98,10 @@ export const pdfRouter = router({
         pdfData: base64,
         cardIds: result.cardIds,
         totalPages: result.totalPages,
-        message: `Generated ${input.count} cards successfully`,
+        playerUuid,
+        message: playerUuid 
+          ? `Generated ${input.count} cards and created player ${playerUuid}`
+          : `Generated ${input.count} cards successfully`,
       };
     }),
 

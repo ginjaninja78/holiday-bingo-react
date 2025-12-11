@@ -485,3 +485,95 @@ This web version serves as a visual reference for the Windows native Wails appli
 - [ ] Update IMAGE_GALLERY constant
 - [ ] Test new images in gameplay
 - [ ] Test new images in PDF generation
+
+
+## PLAYER MANAGEMENT SYSTEM (Dec 11, 2025)
+
+### Database Schema Updates
+- [x] Create players table (uuid, name, created_at)
+- [x] Create player_cards table (player_uuid, card_id, game_id, is_played)
+- [x] Update game_history table to include player_uuid references
+- [x] Add player_scores table (player_uuid, game_id, wins, patterns_won)
+- [x] Push database migrations
+
+### Player Management Panel (Gallery-Style Drawer)
+- [x] Create PlayerManagementPanel component
+- [x] Implement grid display of players with card counts
+- [x] Add single-select mode (click to view player details)
+- [x] Add multi-select mode (toggle button + checkboxes)
+- [x] Add "Select All" functionality
+- [x] Display player UUID, name, and card count
+- [ ] Auto-remove played cards from active roster (backend integration pending)
+- [x] Add delete player functionality
+- [x] Add player creation form (name input)
+
+### CSV Import/Export Functionality
+- [x] Add "Import CSV" button to player panel
+- [x] Implement CSV file upload handler
+- [x] Parse CSV format: player_uuid,name,card_id1|card_id2|...
+- [x] Validate CSV data before import
+- [x] Show import summary dialog (X players, Y cards)
+- [x] Add "Export CSV" button (activates multi-select)
+- [x] Generate CSV from selected players
+- [x] Show export confirmation dialog with player count
+- [x] Download CSV file with proper formatting
+- [x] Handle batch player naming from CSV
+
+### Previous Games Archive Panel
+- [x] Create PreviousGamesPanel component (drawer-style)
+- [x] Display list of completed games with dates
+- [x] Show game summary (rounds, patterns, winners)
+- [x] Implement expandable game details view
+- [x] Display player logs per game (name, score, patterns won)
+- [x] Display images played per game in chronological order
+- [ ] Add restore game functionality (view-only mode)
+- [x] Add delete archived game functionality
+- [ ] Implement pagination for large game history
+
+### Backend tRPC Procedures
+- [x] Implement players.create procedure (generate UUID, store name)
+- [x] Implement players.getAll procedure
+- [x] Implement players.update procedure (rename)
+- [x] Implement players.delete procedure
+- [x] Implement players.importCSV procedure (batch create)
+- [x] Implement players.exportCSV procedure (generate CSV data)
+- [x] Implement playerCards.linkToPlayer procedure (assign cards to player)
+- [x] Implement playerCards.markAsPlayed procedure
+- [x] Implement playerCards.getByPlayer procedure
+- [x] Implement gameHistory.archive procedure (store completed game)
+- [x] Implement gameHistory.getAll procedure
+- [x] Implement gameHistory.getById procedure (with full details)
+- [x] Implement gameHistory.delete procedure
+- [ ] Implement scores.updateOnBingo procedure (real-time score tracking)
+- [ ] Implement scores.getLeaderboard procedure (current game)
+- [ ] Implement scores.getByGame procedure (historical scores)
+
+### Auto-Linking PDF Generation to Players
+- [x] Update PDF generation flow to create player records
+- [x] Generate Player UUID for each batch of cards
+- [x] Link all Card IDs in batch to single Player UUID
+- [x] Store player-card associations in database
+- [ ] Update GameSetupPanel to show player creation option (UI integration pending)
+- [ ] Add "Assign to Player" field in PDF generation form (UI integration pending)
+- [ ] Auto-populate player roster after PDF generation (UI integration pending)
+- [ ] Show confirmation: "X cards assigned to Player [UUID]" (UI integration pending)
+
+### Real-Time Score Updates
+- [ ] Update bingo.verifyBingo to call scores.updateOnBingo
+- [ ] Increment player win count on successful verification
+- [ ] Update leaderboard in real-time via tRPC subscription
+- [ ] Show toast notification with player name on BINGO
+- [ ] Update ScoreTrackingPanel to use live data
+- [ ] Add winner announcement with player name (not just Card ID)
+
+### Integration & Testing
+- [ ] Connect PlayerManagementPanel to backend procedures
+- [ ] Connect PreviousGamesPanel to backend procedures
+- [ ] Test CSV import with sample data (10 players, 50 cards)
+- [ ] Test CSV export with multi-select
+- [ ] Test auto-linking during PDF generation
+- [ ] Test player card removal after play
+- [ ] Test game archiving at end of game
+- [ ] Test score updates during live gameplay
+- [ ] Test leaderboard with real player names
+- [ ] Verify Player UUID tracking throughout system

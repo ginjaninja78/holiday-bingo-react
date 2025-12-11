@@ -36,7 +36,7 @@ export type GameSession = typeof gameSessions.$inferSelect;
 export type InsertGameSession = typeof gameSessions.$inferInsert;
 
 /**
- * Players in a game session
+ * Players in a game session (legacy - for multiplayer mode)
  */
 export const players = mysqlTable("players", {
   id: int("id").autoincrement().primaryKey(),
@@ -48,6 +48,35 @@ export const players = mysqlTable("players", {
   isActive: boolean("is_active").default(true).notNull(),
   joinedAt: timestamp("joined_at").defaultNow().notNull(),
 });
+
+/**
+ * Managed players (for host-only mode with CSV import/export)
+ */
+export const managedPlayers = mysqlTable("managed_players", {
+  id: int("id").autoincrement().primaryKey(),
+  playerUuid: varchar("player_uuid", { length: 64 }).notNull().unique(),
+  playerName: varchar("player_name", { length: 200 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ManagedPlayer = typeof managedPlayers.$inferSelect;
+export type InsertManagedPlayer = typeof managedPlayers.$inferInsert;
+
+/**
+ * Player cards - links managed players to their bingo cards
+ */
+export const playerCards = mysqlTable("player_cards", {
+  id: int("id").autoincrement().primaryKey(),
+  playerUuid: varchar("player_uuid", { length: 64 }).notNull().references(() => managedPlayers.playerUuid),
+  cardId: varchar("card_id", { length: 5 }).notNull().references(() => generatedCards.cardId),
+  gameId: int("game_id").references(() => hostGameState.id),
+  isPlayed: boolean("is_played").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type PlayerCard = typeof playerCards.$inferSelect;
+export type InsertPlayerCard = typeof playerCards.$inferInsert;
 
 export type Player = typeof players.$inferSelect;
 export type InsertPlayer = typeof players.$inferInsert;
@@ -216,3 +245,30 @@ export const generatedCards = mysqlTable("generated_cards", {
 
 export type GeneratedCard = typeof generatedCards.$inferSelect;
 export type InsertGeneratedCard = typeof generatedCards.$inferInsert;
+
+/**
+ * Game history - archived completed games
+ */
+export const gameHistory = mysqlTable("game_history", {
+  id: int("id").autoincrement().primaryKey(),
+  hostId: int("host_id").notNull().references(() => users.id),
+  gameName: varchar("game_name", { length: 200 }),
+  totalRounds: int("total_rounds").notNull(),
+  completedRounds: int("completed_rounds").notNull(),
+  patterns: json("patterns").notNull().$type<WinningPattern[]>(),
+  playedImages: json("played_images").notNull().$type<PlayedImage[]>(),
+  playerScores: json("player_scores").notNull().$type<PlayerScore[]>(),
+  startedAt: timestamp("started_at").notNull(),
+  endedAt: timestamp("ended_at").defaultNow().notNull(),
+});
+
+export type GameHistory = typeof gameHistory.$inferSelect;
+export type InsertGameHistory = typeof gameHistory.$inferInsert;
+
+export interface PlayerScore {
+  playerUuid: string;
+  playerName: string;
+  wins: number;
+  patternsWon: string[];
+  cardIds: string[];
+}
