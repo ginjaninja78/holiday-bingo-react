@@ -1,0 +1,110 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, 'feature/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Test & Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        run: npm install -g pnpm
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: TypeScript type check
+        run: pnpm tsc --noEmit
+      
+      - name: Run linter
+        run: pnpm lint || echo "Linter not configured yet"
+      
+      - name: Run tests
+        run: pnpm test
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      
+      - name: Build project
+        run: pnpm build
+      
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            dist/
+            client/dist/
+          retention-days: 7
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check for console.log statements
+        run: |
+          if grep -r "console\.log" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules .; then
+            echo "❌ Found console.log statements. Please use proper logging."
+            exit 1
+          else
+            echo "✅ No console.log statements found"
+          fi
+      
+      - name: Check for TypeScript any types
+        run: |
+          if grep -r ": any\|<any>" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules .; then
+            echo "⚠️  Found TypeScript 'any' types. Consider using specific types."
+            # Don't fail build, just warn
+          else
+            echo "✅ No 'any' types found"
+          fi
+      
+      - name: Check file sizes
+        run: |
+          find . -name "*.ts" -o -name "*.tsx" | while read file; do
+            lines=$(wc -l < "$file")
+            if [ $lines -gt 500 ]; then
+              echo "⚠️  $file has $lines lines (>500). Consider refactoring."
+            fi
+          done
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run security audit
+        run: |
+          npm install -g pnpm
+          pnpm audit --audit-level=moderate || true
+      
+      - name: Check for secrets in code
+        run: |
+          if grep -r "ghp_\|sk_\|pk_" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules .; then
+            echo "❌ Found potential secrets in code!"
+            exit 1
+          else
+            echo "✅ No secrets found in code"
+          fi

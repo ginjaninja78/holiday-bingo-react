@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, label, url FROM gallery_images WHERE deleted_at IS NULL ORDER BY id LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2podaE9eWugRKvf.aeda70bcbee1 --database EACR5LxScQkKAsrZZvc3Jy --execute SELECT id, label, url FROM gallery_images WHERE deleted_at IS NULL ORDER BY id LIMIT 10",
+  "rows": [
+    {
+      "id": "1",
+      "label": "Christmas tree in snow",
+      "url": "/images/gallery/001_christmas_tree_snow.png"
+    },
+    {
+      "id": "2",
+      "label": "Kwanzaa kinara candles",
+      "url": "/images/gallery/002_kwanzaa_kinara.png"
+    },
+    {
+      "id": "3",
+      "label": "Winter solstice bonfire",
+      "url": "/images/gallery/003_winter_solstice_bonfire.png"
+    },
+    {
+      "id": "4",
+      "label": "Dreidels and gelt coins",
+      "url": "/images/gallery/004_dreidels_gelt.png"
+    },
+    {
+      "id": "5",
+      "label": "Snowy forest landscape",
+      "url": "/images/gallery/005_snowy_forest.png"
+    },
+    {
+      "id": "6",
+      "label": "Festive holiday cookies",
+      "url": "/images/gallery/006_holiday_cookies.png"
+    },
+    {
+      "id": "7",
+      "label": "Cardinal bird in snow",
+      "url": "/images/gallery/007_cardinal_snow.png"
+    },
+    {
+      "id": "8",
+      "label": "Festive string lights",
+      "url": "/images/gallery/008_string_lights.png"
+    },
+    {
+      "id": "9",
+      "label": "Cozy fireplace scene",
+      "url": "/images/gallery/009_cozy_fireplace.png"
+    },
+    {
+      "id": "10",
+      "label": "Ice skating rink",
+      "url": "/images/gallery/010_ice_skating.png"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tlabel\turl\n1\tChristmas tree in snow\t/images/gallery/001_christmas_tree_snow.png\n2\tKwanzaa kinara candles\t/images/gallery/002_kwanzaa_kinara.png\n3\tWinter solstice bonfire\t/images/gallery/003_winter_solstice_bonfire.png\n4\tDreidels and gelt coins\t/images/gallery/004_dreidels_gelt.png\n5\tSnowy forest landscape\t/images/gallery/005_snowy_forest.png\n6\tFestive holiday cookies\t/images/gallery/006_holiday_cookies.png\n7\tCardinal bird in snow\t/images/gallery/007_cardinal_snow.png\n8\tFestive string lights\t/images/gallery/008_string_lights.png\n9\tCozy fireplace scene\t/images/gallery/009_cozy_fireplace.png\n10\tIce skating rink\t/images/gallery/010_ice_skating.png\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

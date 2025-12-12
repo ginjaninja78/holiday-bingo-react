@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as total_count FROM gallery_images",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2podaE9eWugRKvf.aeda70bcbee1 --database EACR5LxScQkKAsrZZvc3Jy --execute SELECT COUNT(*) as total_count FROM gallery_images",
+  "rows": [
+    {
+      "total_count": "60"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_count\n60\n",
+  "stderr": "",
+  "execution_time_ms": 88
+}

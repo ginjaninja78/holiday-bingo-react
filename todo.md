@@ -632,3 +632,16 @@ This web version serves as a visual reference for the Windows native Wails appli
 - [ ] Make "Welcome, Host!" clickable to edit host name
 - [ ] Add inline edit or dialog for host name change
 - [ ] Persist host name in game state/settings
+
+
+## MULTI-AGENT ORCHESTRATION SYSTEM
+- [ ] Research GitHub Copilot instructions best practices thoroughly
+- [ ] Research GitHub MCP server configuration and tool usage optimization
+- [ ] Study ruleset-recipes repository for RULES file patterns
+- [ ] Design multi-agent orchestration architecture
+- [ ] Create copilot-instructions.md with comprehensive rules
+- [ ] Create RULES files for different project areas (frontend, backend, database, testing)
+- [ ] Configure GitHub MCP server with optimal tool/skill usage
+- [ ] Create Master TODO coordination system for multi-agent collaboration
+- [ ] Document setup guide for GitHub Copilot + MCP server integration
+- [ ] Test multi-agent workflow and validate non-interference

@@ -1,0 +1,119 @@
+name: Auto-Merge Approved PRs
+
+on:
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+
+jobs:
+  auto-merge:
+    name: Auto-Merge PR
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    
+    steps:
+      - name: Check if PR is approved and CI passed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              console.log('No PR found in context');
+              return;
+            }
+            
+            // Get PR reviews
+            const reviews = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number
+            });
+            
+            const approvedReviews = reviews.data.filter(r => r.state === 'APPROVED');
+            const hasApproval = approvedReviews.length > 0;
+            
+            if (!hasApproval) {
+              console.log('PR not approved yet');
+              return;
+            }
+            
+            // Get PR status checks
+            const checks = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: pr.head.sha
+            });
+            
+            const allChecksPassed = checks.data.check_runs.every(check => 
+              check.status === 'completed' && check.conclusion === 'success'
+            );
+            
+            if (!allChecksPassed) {
+              console.log('Not all checks passed');
+              return;
+            }
+            
+            // Check for merge conflicts
+            const prData = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number
+            });
+            
+            if (prData.data.mergeable === false) {
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: '⚠️ Cannot auto-merge: merge conflicts detected. Please resolve conflicts.'
+              });
+              return;
+            }
+            
+            // All conditions met - merge PR
+            try {
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                merge_method: 'squash',
+                commit_title: `${pr.title} (#${pr.number})`,
+                commit_message: pr.body || ''
+              });
+              
+              console.log(`✅ Successfully merged PR #${pr.number}`);
+              
+              // Add comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: '✅ Auto-merged after approval and successful CI checks!'
+              });
+              
+              // Delete branch if it's a feature branch
+              if (pr.head.ref.startsWith('feature/') || pr.head.ref.startsWith('fix/')) {
+                try {
+                  await github.rest.git.deleteRef({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: `heads/${pr.head.ref}`
+                  });
+                  console.log(`Deleted branch ${pr.head.ref}`);
+                } catch (error) {
+                  console.log(`Could not delete branch: ${error.message}`);
+                }
+              }
+              
+            } catch (error) {
+              console.log(`Failed to merge: ${error.message}`);
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: `⚠️ Auto-merge failed: ${error.message}`
+              });
+            }
