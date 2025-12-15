@@ -58,7 +58,6 @@ export const pdfRouter = router({
     .mutation(async ({ input }) => {
       const result = await generateMultipleCardsPDF({
         count: input.count,
-        gamesPerPlayer: input.gamesPerPlayer,
       });
 
       if (!result.success) {
