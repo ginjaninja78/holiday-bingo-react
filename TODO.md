@@ -12,23 +12,21 @@
 
 ### Scoring System Integration
 **Status:** Not Started  
-**Effort:** 4-6 hours  
-**Description:** Connect Card UUID tracking to the scoring/game management system so hosts can track which cards have won.
+**Effort:** 5-6 hours  
+**Description:** Connect Card UUID tracking to the scoring/game management system so hosts can verify bingo winners.
 
-- [ ] Verify Card ID is properly stored in `generated_cards` table when PDF is created
-- [ ] Create game session management (host creates game, gets game ID)
-- [ ] Link generated cards to active game session
-- [ ] Build host dashboard to view all cards in current game
-- [ ] Implement "Call Image" feature - host selects image that was called
-- [ ] Track called images per game session
-- [ ] Calculate potential winners (cards with bingo based on called images)
-- [ ] Add "Verify Winner" - host enters Card ID, system checks if valid bingo
+**📄 Detailed Implementation Guide:** `docs/TODO-SCORING-SYSTEM.md`
 
-**Files to modify:**
-- `drizzle/schema.ts` - Add game sessions table if not exists
-- `server/db.ts` - Add game/scoring queries
-- `server/routers.ts` - Add scoring procedures
-- `client/src/pages/HostDashboard.tsx` - Add scoring UI
+**Summary of Phases:**
+1. Link generated cards to game sessions
+2. Create bingo verification logic (all patterns)
+3. Build host UI for winner verification
+4. Unit tests for verification
+
+**Key Files:**
+- `server/bingoVerification.ts` (NEW)
+- `server/routers.ts` - Add verification procedures
+- `client/src/components/WinnerVerificationPanel.tsx` (NEW)
 
 ---
 
@@ -54,34 +52,19 @@ See detailed implementation guide: `docs/TODO-PDF-CHECKBOXES.md`
 
 ### Editable Host Name
 **Status:** Not Started  
-**Effort:** 1-2 hours  
-**Description:** Make "Welcome, Host!" clickable/editable so hosts can personalize their dashboard.
+**Effort:** 1 hour  
+**Description:** Make "Welcome, Host!" clickable/editable so hosts can personalize their display name.
 
-- [ ] Add `hostDisplayName` field to user preferences or local storage
-- [ ] Make "Welcome, Host!" text clickable in DashboardLayout
-- [ ] Show inline edit field or modal on click
-- [ ] Save preference (localStorage for quick win, or DB for persistence)
-- [ ] Display custom name instead of "Host"
+**📄 Detailed Implementation Guide:** `docs/TODO-EDITABLE-HOST-NAME.md`
 
-**Files to modify:**
-- `client/src/components/DashboardLayout.tsx` - Add click handler and edit UI
-- Optional: `drizzle/schema.ts` - Add user preferences if persisting to DB
+**Summary:**
+1. Add state for hostName in PlayScreen.tsx
+2. Replace static text with clickable/editable component
+3. Persist to localStorage
+4. Enter to save, Escape to cancel
 
-**Quick Implementation Option:**
-```typescript
-// In DashboardLayout.tsx
-const [hostName, setHostName] = useState(
-  localStorage.getItem('hostDisplayName') || 'Host'
-);
-
-const handleNameClick = () => {
-  const newName = prompt('Enter your display name:', hostName);
-  if (newName) {
-    setHostName(newName);
-    localStorage.setItem('hostDisplayName', newName);
-  }
-};
-```
+**Key File:**
+- `client/src/pages/PlayScreen.tsx` (line ~249)
 
 ---
 
