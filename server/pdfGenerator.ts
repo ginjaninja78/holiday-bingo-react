@@ -1,6 +1,7 @@
 /**
  * PDF Generator for Bingo Cards
  * Uses jsPDF to create printable bingo cards matching SSO&O Holiday Bingo template
+ * Works in both development (filesystem) and production (HTTP fetch) environments
  */
 
 import { jsPDF } from "jspdf";
@@ -11,6 +12,8 @@ import { generateBingoCards } from "../shared/cardGenerator";
 import sharp from "sharp";
 import * as fs from "fs";
 import * as path from "path";
+
+const isProduction = process.env.NODE_ENV === "production";
 
 export interface PDFGenerationOptions {
   count: number; // Number of cards (players) to generate
@@ -35,39 +38,68 @@ interface CardImage {
 let logoBase64: string | null = null;
 let freeSpaceBase64: string | null = null;
 
+/**
+ * Get the base path for static assets based on environment
+ */
+function getStaticBasePath(): string {
+  if (isProduction) {
+    // In production, static files are in the dist/public directory relative to server
+    return path.resolve(import.meta.dirname, "public");
+  } else {
+    // In development, use the client/public directory
+    return "/home/ubuntu/holiday-bingo/client/public";
+  }
+}
+
+/**
+ * Load image from filesystem and convert to base64
+ */
+async function loadImageToBase64(relativePath: string, maxWidth?: number): Promise<string | null> {
+  const basePath = getStaticBasePath();
+  const fullPath = path.join(basePath, relativePath);
+  
+  console.log(`[PDF] Loading image: ${fullPath} (exists: ${fs.existsSync(fullPath)})`);
+  
+  if (!fs.existsSync(fullPath)) {
+    console.log(`[PDF] Image not found: ${fullPath}`);
+    return null;
+  }
+  
+  try {
+    let sharpInstance = sharp(fullPath);
+    if (maxWidth) {
+      sharpInstance = sharpInstance.resize(maxWidth, maxWidth, { fit: "inside" });
+    }
+    const buffer = await sharpInstance.png().toBuffer();
+    return `data:image/png;base64,${buffer.toString("base64")}`;
+  } catch (error) {
+    console.error(`[PDF] Failed to load image ${fullPath}:`, error);
+    return null;
+  }
+}
+
 async function loadStaticAssets(): Promise<void> {
-  const basePath = "/home/ubuntu/holiday-bingo/client/public/images";
+  console.log(`[PDF] Loading static assets (production: ${isProduction})`);
   
   // Load John Hancock logo (PNG)
-  const logoPath = path.join(basePath, "john-hancock-logo.png");
-  if (fs.existsSync(logoPath)) {
-    const logoBuffer = await sharp(logoPath).png().toBuffer();
-    logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
-    console.log("[PDF] Logo loaded:", logoBuffer.length, "bytes");
-  } else {
-    console.log("[PDF] Logo not found at:", logoPath);
+  logoBase64 = await loadImageToBase64("images/john-hancock-logo.png");
+  if (logoBase64) {
+    console.log("[PDF] Logo loaded successfully");
   }
   
   // Load FREE SPACE image (PNG)
-  const freeSpacePath = path.join(basePath, "free-space.png");
-  if (fs.existsSync(freeSpacePath)) {
-    const freeBuffer = await sharp(freeSpacePath).resize(150).png().toBuffer();
-    freeSpaceBase64 = `data:image/png;base64,${freeBuffer.toString("base64")}`;
-    console.log("[PDF] Free space loaded:", freeBuffer.length, "bytes");
-  } else {
-    console.log("[PDF] Free space not found at:", freeSpacePath);
+  freeSpaceBase64 = await loadImageToBase64("images/free-space.png", 150);
+  if (freeSpaceBase64) {
+    console.log("[PDF] Free space loaded successfully");
   }
 }
 
 /**
  * Convert image file to base64
  */
-async function imageToBase64(filePath: string, maxWidth: number = 150): Promise<string> {
-  const buffer = await sharp(filePath)
-    .resize(maxWidth, maxWidth, { fit: "inside" })
-    .png()
-    .toBuffer();
-  return `data:image/png;base64,${buffer.toString("base64")}`;
+async function imageToBase64(imageUrl: string, maxWidth: number = 150): Promise<string | null> {
+  // imageUrl is like "/images/gallery/001_christmas_tree.png"
+  return await loadImageToBase64(imageUrl, maxWidth);
 }
 
 /**
@@ -285,7 +317,6 @@ export async function generateMultipleCardsPDF(
     console.log("[PDF] Converting", usedImageIds.size, "unique images to base64...");
     
     const imageMap = new Map<number, typeof images[0] & { base64?: string }>();
-    const basePath = "/home/ubuntu/holiday-bingo/client/public";
     
     for (const img of images) {
       if (!usedImageIds.has(img.id)) {
@@ -293,12 +324,11 @@ export async function generateMultipleCardsPDF(
         continue;
       }
       try {
-        const localPath = path.join(basePath, img.url);
-        if (fs.existsSync(localPath)) {
-          const base64 = await imageToBase64(localPath, 150);
+        const base64 = await imageToBase64(img.url, 150);
+        if (base64) {
           imageMap.set(img.id, { ...img, base64 });
         } else {
-          console.warn(`[PDF] Image not found: ${localPath}`);
+          console.warn(`[PDF] Could not load image ${img.id}: ${img.url}`);
           imageMap.set(img.id, img);
         }
       } catch (error) {
@@ -382,14 +412,12 @@ export async function generateSingleCardPDF(
       .from(galleryImages)
       .where(isNull(galleryImages.deletedAt));
 
-    const basePath = "/home/ubuntu/holiday-bingo/client/public";
     const imageMap = new Map<number, typeof images[0] & { base64?: string }>();
     
     for (const img of images) {
       try {
-        const localPath = path.join(basePath, img.url);
-        if (fs.existsSync(localPath)) {
-          const base64 = await imageToBase64(localPath, 150);
+        const base64 = await imageToBase64(img.url, 150);
+        if (base64) {
           imageMap.set(img.id, { ...img, base64 });
         } else {
           imageMap.set(img.id, img);
@@ -464,14 +492,12 @@ export async function generatePDFsForCards(
       .from(galleryImages)
       .where(isNull(galleryImages.deletedAt));
 
-    const basePath = "/home/ubuntu/holiday-bingo/client/public";
     const imageMap = new Map<number, typeof images[0] & { base64?: string }>();
     
     for (const img of images) {
       try {
-        const localPath = path.join(basePath, img.url);
-        if (fs.existsSync(localPath)) {
-          const base64 = await imageToBase64(localPath, 150);
+        const base64 = await imageToBase64(img.url, 150);
+        if (base64) {
           imageMap.set(img.id, { ...img, base64 });
         } else {
           imageMap.set(img.id, img);
@@ -525,4 +551,3 @@ export async function generatePDFsForCards(
     };
   }
 }
-// Production ready - Tue Dec 16 02:00:24 EST 2025
