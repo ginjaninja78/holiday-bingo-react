@@ -1,5 +1,7 @@
 import { eq, and, desc } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/mysql2";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import Database from "better-sqlite3";
+import * as path from "path";
 import {
   InsertUser,
   users,
@@ -20,11 +22,26 @@ import {
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _sqlite: Database.Database | null = null;
 
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  if (!_db) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      // Determine database path
+      const dbPath = process.env.DATABASE_PATH || path.join(process.cwd(), "data", "bingo.db");
+      
+      // Ensure data directory exists
+      const fs = await import("fs");
+      const dataDir = path.dirname(dbPath);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      
+      console.log(`[Database] Connecting to SQLite at: ${dbPath}`);
+      _sqlite = new Database(dbPath);
+      _sqlite.pragma("journal_mode = WAL"); // Better performance
+      _db = drizzle(_sqlite);
+      console.log("[Database] SQLite connected successfully");
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -85,7 +102,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = new Date();
     }
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
+    await db.insert(users).values(values).onConflictDoUpdate({
+      target: users.openId,
       set: updateSet,
     });
   } catch (error) {
@@ -116,8 +134,8 @@ export async function createGameSession(session: InsertGameSession) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(gameSessions).values(session);
-  return result[0].insertId;
+  const result = await db.insert(gameSessions).values(session).returning({ id: gameSessions.id });
+  return result[0].id;
 }
 
 export async function getGameSessionByCode(sessionCode: string) {
@@ -162,8 +180,8 @@ export async function createPlayer(player: InsertPlayer) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(players).values(player);
-  return result[0].insertId;
+  const result = await db.insert(players).values(player).returning({ id: players.id });
+  return result[0].id;
 }
 
 export async function getPlayerByUuid(playerUuid: string) {
@@ -202,8 +220,8 @@ export async function createBingoCard(card: InsertBingoCard) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(bingoCards).values(card);
-  return result[0].insertId;
+  const result = await db.insert(bingoCards).values(card).returning({ id: bingoCards.id });
+  return result[0].id;
 }
 
 export async function getPlayerCard(playerId: number, roundNumber: number) {
@@ -243,8 +261,8 @@ export async function addCalledImage(calledImage: InsertCalledImage) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(calledImages).values(calledImage);
-  return result[0].insertId;
+  const result = await db.insert(calledImages).values(calledImage).returning({ id: calledImages.id });
+  return result[0].id;
 }
 
 export async function getCalledImages(sessionId: number, roundNumber: number) {
@@ -269,8 +287,8 @@ export async function createBingoClaim(claim: InsertBingoClaim) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(bingoClaims).values(claim);
-  return result[0].insertId;
+  const result = await db.insert(bingoClaims).values(claim).returning({ id: bingoClaims.id });
+  return result[0].id;
 }
 
 export async function getPendingClaims(sessionId: number) {
@@ -305,8 +323,8 @@ export async function createAdminSession(session: InsertAdminSession) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(adminSessions).values(session);
-  return result[0].insertId;
+  const result = await db.insert(adminSessions).values(session).returning({ id: adminSessions.id });
+  return result[0].id;
 }
 
 export async function getAdminSessionByToken(sessionToken: string) {
