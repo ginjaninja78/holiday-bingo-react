@@ -649,3 +649,153 @@ If you're unsure about a pattern or approach:
 2. Look for similar implementations in the codebase
 3. Check `MASTER-TODO.md` for context
 4. Refer to `/docs` for detailed documentation
+
+
+## AI Voice Announcer System
+
+The Holiday Bingo application includes an **optional, modular AI Voice Announcer** system that provides engaging commentary, humor, and host assistance during gameplay.
+
+### Overview
+
+- **Location:** `server/announcer/` (backend), `client/src/components/announcer/` and `client/src/hooks/announcer/` (frontend)
+- **Integration:** tRPC router (`announcerRouter`) added to `server/routers.ts`
+- **Database:** Separate schema file (`drizzle/schema-announcer.ts`) with 4 tables
+- **API:** ElevenLabs for text-to-speech generation
+- **Caching:** Filesystem and database caching for cost optimization (80-95% savings)
+
+### Key Components
+
+| Component | Purpose |
+|-----------|---------|
+| `announcerService.ts` | Main orchestration service |
+| `elevenlabs.ts` | ElevenLabs API client |
+| `audioCache.ts` | Audio caching system |
+| `sessionMemory.ts` | Session tracking and context |
+| `humorEngine.ts` | Contextual joke generation |
+| `announcerRouter.ts` | tRPC API endpoints |
+| `useAnnouncer.ts` | React hook for frontend |
+| `AnnouncerControlPanel.tsx` | Settings UI component |
+
+### Database Tables
+
+1. **`announcer_settings`** - Global configuration (volume, humor level, etc.)
+2. **`announcer_audio_cache`** - Cached audio file metadata
+3. **`announcer_session_memory`** - Game session tracking (wins, delays, jokes)
+4. **`announcer_image_quips`** - Humor database (3-5 quips per image)
+
+### Setup
+
+```bash
+# 1. Run announcer database migration
+pnpm tsx scripts/migrate-announcer.ts
+
+# 2. Seed humor database
+pnpm tsx scripts/seed-humor.ts
+
+# 3. Add ElevenLabs API key to .env
+ELEVENLABS_API_KEY="your_key_here"
+```
+
+### Usage in Code
+
+**Starting a session:**
+```typescript
+const { startSession, endSession } = useAnnouncer();
+
+// When game starts
+startSession(gameSessionId);
+
+// When game ends
+endSession(gameSessionId);
+```
+
+**Announcing events:**
+```typescript
+const { announceCard, announceWinner } = useAnnouncer(gameSessionId);
+
+// When new card is revealed
+announceCard(imageId);
+
+// When player wins
+announceWinner(playerName);
+```
+
+**Adding the control panel:**
+```typescript
+import { AnnouncerControlPanel } from '../components/announcer/AnnouncerControlPanel';
+
+// In host dashboard or settings
+<AnnouncerControlPanel />
+```
+
+### Features
+
+1. **Game Intro** - Announces game start with configurable humor
+2. **Card Announcements** - Reads each card with observational humor
+3. **Winner Roasting** - Professional but sparky congratulations with escalating humor
+4. **Host Nudging** - Gentle reminders if host delays too long (10s default)
+5. **Contextual Awareness** - Tracks wins, delays, and jokes to avoid repetition
+6. **Cost Optimization** - Caches all audio to minimize API calls
+
+### Humor Levels
+
+- **Professional** (default) - Corporate-appropriate, warm, traditional
+- **Sparky** - Fun, witty, engaging with personality
+- **Roast** - Sarcastic, edgy, but still professional
+
+### Testing
+
+```bash
+# Health check
+curl http://localhost:3000/api/announcer/health
+
+# Test announcement
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"type":"intro"}' http://localhost:3000/api/announcer/announce
+```
+
+### Rollback
+
+To completely disable the announcer:
+
+1. Remove `AnnouncerControlPanel` from UI
+2. Comment out `useAnnouncer` hook calls
+3. Remove `announcer: announcerRouter` from `server/routers.ts`
+4. Restart server
+
+The core game will continue to function normally.
+
+### Cost Estimates
+
+- **With caching:** $0-5/month (typical usage)
+- **Without caching:** $20-50/month
+- **Per announcement:** ~$0.001-0.003 (first time only)
+
+### Adding New Humor
+
+To add custom quips for images:
+
+```typescript
+// In scripts/seed-humor.ts or via database insert
+await db.insert(announcerImageQuips).values({
+  imageId: 42,
+  text: "Your custom joke here!",
+  humorLevel: 'sparky',
+});
+```
+
+### Extending Functionality
+
+The announcer system is designed to be extended. Common extensions:
+
+- **Music player** - Add background holiday music during pauses
+- **Sound effects** - Add celebratory sounds for wins
+- **Custom voices** - Use different ElevenLabs voices for variety
+- **Multi-language** - Support announcements in multiple languages
+- **Host interaction** - Respond to host chat messages
+
+See `ANNOUNCER_ARCHITECTURE.md` and `ANNOUNCER_INTEGRATION.md` for comprehensive documentation.
+
+---
+
+**Remember:** The announcer is completely modular. All announcer code is isolated and can be safely removed or disabled without affecting core gameplay.
