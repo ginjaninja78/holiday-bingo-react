@@ -47,7 +47,7 @@ function getStaticBasePath(): string {
     return path.resolve(import.meta.dirname, "public");
   } else {
     // In development, use the client/public directory
-    return "/home/ubuntu/holiday-bingo-react/client/public";
+    return "/home/ubuntu/holiday-bingo/client/public";
   }
 }
 
@@ -376,12 +376,9 @@ export async function generateMultipleCardsPDF(
     };
   } catch (error) {
     console.error("[PDF] Error generating PDF:", error);
-    console.error("[PDF] Stack trace:", error instanceof Error ? error.stack : "No stack trace");
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("[PDF] Error message:", errorMessage);
     return {
       success: false,
-      error: errorMessage,
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
